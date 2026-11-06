@@ -2,7 +2,7 @@
 
 **Latent metabolic phenotypes in 2,290 US adults (NHANES 2017–2018)**
 Scientific Visualization · MSc Computer Science · Università degli Studi di Milano · 2026–27
-Behrad Sadeghi (70193A)
+Behrad Sadeghi · Mohammad Ali Noroozshad · Saba Shafiei Sabet
 
 **Presentation:** [`presentation/index.html`](presentation/index.html) — a single self-contained file (25 slides + 2 appendix). A static backup is in [`presentation/slides.pdf`](presentation/slides.pdf).
 With GitHub Pages enabled on this repo, it is served at `https://<user>.github.io/<repo>/`.
