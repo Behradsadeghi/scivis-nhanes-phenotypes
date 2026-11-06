@@ -1,0 +1,45 @@
+{
+  "lab_diabetes_n": 454,
+  "lab_diabetes_not_told": 0.31497797356828194,
+  "lab_diabetes_not_told_weighted": 0.30922038112402794,
+  "undiagnosed_by_cluster": {
+    "Low-risk": {
+      "n_lab": 44,
+      "n_undx": 12
+    },
+    "Inflammatory": {
+      "n_lab": 72,
+      "n_undx": 38
+    },
+    "Hepatic": {
+      "n_lab": 99,
+      "n_undx": 55
+    },
+    "Dysglycaemic": {
+      "n_lab": 239,
+      "n_undx": 38
+    }
+  },
+  "hepatic_alt_high": 0.39090909090909093,
+  "hepatic_told_liver": 0.0819423368740516,
+  "hepatic_alt_high_told_liver": 0.12403100775193798,
+  "meanshift_modes": 11,
+  "meanshift_largest_share": 0.9506550218340611,
+  "silhouette_k4": 0.11377146210205087,
+  "sizes": {
+    "Low-risk": 810,
+    "Inflammatory": 581,
+    "Hepatic": 660,
+    "Dysglycaemic": 239
+  },
+  "below_130pct_poverty_by_cluster": {
+    "Low-risk": 0.23,
+    "Inflammatory": 0.3413173652694611,
+    "Hepatic": 0.2664359861591695,
+    "Dysglycaemic": 0.27053140096618356
+  },
+  "n": 2290,
+  "external_model_balanced_acc": 0.5323529356839707,
+  "external_model_C": 0.05,
+  "external_model_n": 1879
+}
