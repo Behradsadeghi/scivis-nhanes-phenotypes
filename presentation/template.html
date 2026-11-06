@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en" data-theme="lab">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a blood test knows</title>
+<meta name="description" content="Latent metabolic phenotypes in 2,290 US adults (NHANES 2017–2018). Scientific Visualization project, Università degli Studi di Milano.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Archivo:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ================================================================ TOKENS
+   Three typographic worlds share one data grammar: the four cluster hues are
+   the only colours in the deck, and they never change between themes.      */
+:root{
+  color-scheme: light;
+  --c0:#1f78b4; --c1:#d1457f; --c2:#b07a00; --c3:#5a3fc0;
+  --neg:#3b6e8f; --pos:#b5462f;
+  --W:1600px; --H:900px; --pad:84px;
+  --ease:cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io:cubic-bezier(0.77, 0, 0.175, 1);
+}
+:root[data-theme="lab"]{
+  --paper:#f5f6f8; --card:#ffffff; --ink:#15171c; --ink-2:#4a4f5e; --muted:#868b98; --hair:#d9dce3;
+  --display:"Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif; --dw:600; --dtrack:-0.024em; --dopsz:"opsz" 96;
+  --text:"Instrument Sans", system-ui, sans-serif;
+  --grid:none;
+}
+:root[data-theme="journal"]{
+  --paper:#f8f8f6; --card:#ffffff; --ink:#1b2340; --ink-2:#464d63; --muted:#878c9a; --hair:#d6d8de;
+  --display:"Source Serif 4", Georgia, serif; --dw:600; --dtrack:-0.018em; --dopsz:"opsz" 60;
+  --text:"Instrument Sans", system-ui, sans-serif;
+  --grid:none;
+}
+:root[data-theme="swiss"]{
+  --paper:#fafafa; --card:#ffffff; --ink:#0e0e10; --ink-2:#45464d; --muted:#8a8b92; --hair:#d8d8dc;
+  --display:"Archivo", "Instrument Sans", system-ui, sans-serif; --dw:800; --dtrack:-0.035em; --dopsz:normal;
+  --text:"Instrument Sans", system-ui, sans-serif;
+  --grid:linear-gradient(rgba(14,14,16,.045) 1px, transparent 1px) 0 0/40px 40px, linear-gradient(90deg, rgba(14,14,16,.045) 1px, transparent 1px) 0 0/40px 40px;
+}
+
+/* ================================================================ BASE */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;font-family:var(--text);color:var(--ink)}
+body{background:#dfe1e6}
+::selection{background:color-mix(in srgb, var(--c0) 22%, transparent);color:var(--ink)}
+:focus-visible{outline:3px solid var(--c0);outline-offset:3px;border-radius:4px}
+.viewport{position:fixed;inset:0;overflow:hidden}
+.stage{position:absolute;left:50%;top:50%;width:var(--W);height:var(--H);background:var(--paper);background-image:var(--grid);transform-origin:center center;overflow:hidden}
+#field{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity .45s var(--ease)}
+#field.on{opacity:1}
+.slide{position:absolute;inset:0;z-index:2;padding:64px var(--pad) 96px;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease, visibility 0s linear .22s}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .22s ease}
+
+/* entrance: heading, then text, then figure — once per visit (taste / impeccable) */
+.rv{opacity:1}
+.slide.active .rv{animation:rise .62s var(--ease) both;animation-delay:calc(var(--i) * 85ms + 60ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .slide.active .rv{animation:fade .3s ease both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  #field{transition:none}
+}
+
+/* ================================================================ TYPE */
+h1,h2,.display{font-family:var(--display);font-weight:var(--dw);letter-spacing:var(--dtrack);color:var(--ink);font-variation-settings:var(--dopsz)}
+h2{font-size:44px;line-height:1.08;max-width:1260px;text-wrap:balance}
+:root[data-theme="journal"] h2{font-size:46px;line-height:1.1}
+:root[data-theme="swiss"] h2{font-size:42px;line-height:1.04}
+.dek{margin-top:14px;font-size:21px;line-height:1.45;color:var(--ink-2);max-width:1100px}
+p,li{font-size:20px;line-height:1.5;color:var(--ink-2)}
+strong{color:var(--ink);font-weight:600}
+.k{display:inline-block;width:.62em;height:.62em;border-radius:50%;margin-right:.32em;vertical-align:.04em}
+.k0{background:var(--c0)}.k1{background:var(--c1)}.k2{background:var(--c2)}.k3{background:var(--c3)}
+.ring{display:inline-block;width:.66em;height:.66em;border-radius:50%;border:2px solid var(--ink-2);margin-right:.3em;vertical-align:.02em}
+.dot{display:inline-block;width:.66em;height:.66em;border-radius:50%;background:var(--ink-2);margin-right:.3em;vertical-align:.02em}
+:root[data-theme="swiss"] .slide:not(.hero):not(.opener) h2{padding-top:22px;border-top:6px solid var(--ink)}
+:root[data-theme="journal"] .slide:not(.hero):not(.opener) h2{padding-bottom:18px;border-bottom:1px solid var(--ink)}
+
+/* ================================================================ CONTENT LAYOUT */
+.body{flex:1;display:grid;grid-template-columns:1fr 330px;gap:48px;margin-top:30px;min-height:0}
+.body.full{grid-template-columns:1fr}
+.body.wide{grid-template-columns:1fr;grid-template-rows:1fr auto;gap:22px}
+.fig{min-height:0;display:flex;align-items:center;justify-content:center}
+.fig svg{width:100%;height:100%;max-height:100%;display:block}
+.note{align-self:start;border-left:1px solid var(--hair);padding-left:26px;display:flex;flex-direction:column;gap:16px}
+.note h3{font-family:var(--text);font-size:15px;font-weight:600;color:var(--ink)}
+.note p{font-size:17px;line-height:1.5}
+.note .method{font-size:14.5px;color:var(--muted);line-height:1.45;padding-top:14px;border-top:1px solid var(--hair)}
+.note.row{flex-direction:row;border-left:none;border-top:1px solid var(--hair);padding:18px 0 0;gap:44px}
+.note.row>*{flex:1}
+.note.row h3{flex:0 0 120px}
+.note.row .method{border-top:none;padding-top:0}
+.fignum{display:none;font-family:var(--display);font-weight:600;color:var(--ink);font-size:16px}
+:root[data-theme="journal"] .fignum{display:block}
+:root[data-theme="journal"] .note h3{display:none}
+
+/* ================================================================ RAIL */
+.rail{position:absolute;left:var(--pad);right:var(--pad);bottom:34px;display:flex;align-items:center;gap:28px;font-size:14px;color:var(--muted);z-index:5;transition:opacity .3s}
+.steps{display:flex;gap:6px;flex:1}
+.step{flex:1;display:flex;flex-direction:column;gap:7px}
+.step i{display:block;height:3px;border-radius:2px;background:var(--hair);position:relative;overflow:hidden}
+.step i b{position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+.step.done i b{transform:scaleX(1);opacity:.3}
+.step.on i b{transform:scaleX(var(--p,1));opacity:1}
+.step span{font-size:13.5px}
+.step.on span{color:var(--ink);font-weight:600}
+.count{font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.rail .src{white-space:nowrap}
+
+/* ================================================================ HERO + OPENERS */
+.hero,.opener{padding:0}
+.hero .copy,.opener .copy{position:absolute;left:var(--pad);top:120px;width:640px;z-index:2}
+.hero h1{font-size:84px;line-height:.98;letter-spacing:-0.035em}
+:root[data-theme="journal"] .hero h1{font-size:82px;line-height:1.02;letter-spacing:-0.02em}
+:root[data-theme="swiss"] .hero h1{font-size:88px;line-height:.94;letter-spacing:-0.045em}
+:root[data-theme="swiss"] .hero .copy{border-top:10px solid var(--ink);padding-top:26px;top:96px}
+.hero .sub{margin-top:30px;font-size:24px;line-height:1.4;color:var(--ink-2);max-width:560px}
+.hero .who{position:absolute;left:var(--pad);bottom:110px;z-index:2;font-size:17px;line-height:1.6;color:var(--ink-2)}
+.hero .who b{color:var(--ink);font-weight:600}
+.flegend{position:absolute;right:var(--pad);bottom:110px;z-index:2;display:flex;gap:22px;font-size:15px;color:var(--ink-2)}
+.opener .idx{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:20px}
+.opener .name{font-family:var(--display);font-weight:var(--dw);letter-spacing:-0.04em;font-size:150px;line-height:.9;color:var(--ink);font-variation-settings:var(--dopsz)}
+:root[data-theme="journal"] .opener .name{font-weight:600;letter-spacing:-0.025em;font-style:italic}
+:root[data-theme="swiss"] .opener .copy{border-top:10px solid var(--ink);padding-top:26px}
+.opener .q{margin-top:34px;font-size:30px;line-height:1.3;color:var(--ink);font-family:var(--display);font-weight:500;letter-spacing:-0.01em;max-width:600px;font-variation-settings:var(--dopsz)}
+:root[data-theme="swiss"] .opener .q{font-family:var(--text);font-weight:500}
+.opener .how{margin-top:22px;font-size:18px;line-height:1.5;color:var(--ink-2);max-width:560px}
+.opener .mini{margin-top:34px;display:flex;flex-direction:column;gap:9px;width:560px}
+.opener .mini div{display:grid;grid-template-columns:250px 1fr 64px;gap:14px;align-items:center;font-size:15.5px;color:var(--ink-2)}
+.opener .mini i{display:block;height:10px;border-radius:3px;background:var(--muted);opacity:.5}
+.opener .mini div:last-child i{background:var(--ink);opacity:1}
+.opener .mini b{font-weight:600;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.fieldnote{position:absolute;right:var(--pad);bottom:110px;z-index:3;font-size:15px;color:var(--ink-2);text-align:right;max-width:560px;line-height:1.5}
+
+/* ================================================================ DIAGRAMS ON TEXT SLIDES */
+.blocks{display:grid;grid-template-columns:1fr 150px 1fr;align-items:stretch;margin-top:34px}
+.block{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:32px 34px}
+:root[data-theme="swiss"] .block{border-radius:0;border:1.5px solid var(--ink)}
+:root[data-theme="journal"] .block{border-radius:4px}
+.block h3{font-family:var(--display);font-size:28px;font-weight:var(--dw);letter-spacing:-0.01em}
+.block .role{font-size:18px;color:var(--ink-2);margin-top:4px}
+.fam{margin-top:22px;display:grid;grid-template-columns:130px 1fr;row-gap:14px;column-gap:16px;font-size:18.5px;line-height:1.4}
+.fam dt{color:var(--muted)}
+.fam dd{color:var(--ink)}
+.arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink-2);font-size:15px;text-align:center}
+.arrow svg{width:120px;height:24px}
+.arrow svg path{stroke-dasharray:140;stroke-dashoffset:140}
+.slide.active .arrow svg path{animation:draw .9s var(--ease) .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:auto;padding-top:28px;border-top:1px solid var(--hair)}
+.task h4{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.task p{font-size:18px;line-height:1.45}
+.task .where{color:var(--muted);font-size:16px;margin-top:6px}
+.big{font-family:var(--display);font-weight:var(--dw);font-size:120px;line-height:.9;letter-spacing:-0.04em;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ================================================================ EXPLORER + WAFFLE */
+.explorer{flex:1;display:grid;grid-template-columns:1fr 360px;gap:40px;margin-top:26px;min-height:0}
+.explorer .plot{position:relative;background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+:root[data-theme="swiss"] .explorer .plot{border-radius:0;border:1.5px solid var(--ink)}
+.explorer canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.seg{display:flex;flex-direction:column;gap:10px}
+.seg button{font:inherit;font-size:16.5px;text-align:left;padding:14px 16px;border-radius:10px;border:1px solid var(--hair);background:var(--card);color:var(--ink-2);cursor:pointer;line-height:1.35;transition:border-color .15s, box-shadow .15s, transform .12s var(--ease)}
+.seg button:hover{border-color:var(--ink-2)}
+.seg button:active{transform:scale(.985)}
+.seg button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+:root[data-theme="swiss"] .seg button{border-radius:0}
+.seg button b{display:block;font-weight:600;color:var(--ink);font-size:17px;margin-bottom:2px}
+.readout{margin-top:18px;font-size:16px;line-height:1.55;color:var(--ink-2)}
+.readout table{border-collapse:collapse;width:100%;margin-top:6px;font-variant-numeric:tabular-nums}
+.readout td{padding:5px 0;border-bottom:1px solid var(--hair);font-size:15.5px}
+.readout td:last-child{text-align:right;color:var(--ink);font-weight:500}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:14px;line-height:1.45;padding:9px 12px;border-radius:8px;white-space:nowrap;opacity:0;transition:opacity .12s;z-index:6}
+.tip b{font-weight:600}
+.waffle{position:relative;min-height:0}
+.waffle svg{width:100%;height:100%;display:block;overflow:visible}
+.waffle circle{transition:fill .35s ease, r .35s var(--ease)}
+.waffle text{font-family:var(--text)}
+
+/* ================================================================ LIMITS / CHECKLIST / CLOSE */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:72px;margin-top:48px}
+.two h3{font-family:var(--display);font-size:30px;font-weight:var(--dw);margin-bottom:14px;letter-spacing:-0.01em}
+.two ul{list-style:none;display:flex;flex-direction:column;gap:24px}
+.two li{font-size:21px;padding-left:22px;position:relative}
+.two li::before{content:"";position:absolute;left:0;top:.62em;width:9px;height:2px;background:var(--ink-2)}
+.check{margin-top:28px;width:100%;border-collapse:collapse}
+.check td{padding:17px 20px 17px 0;border-bottom:1px solid var(--hair);vertical-align:top;font-size:19px;line-height:1.4;color:var(--ink-2)}
+.check td:first-child{width:36px;font-family:var(--display);font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.check td:nth-child(2){width:560px;color:var(--ink);font-weight:500}
+.take{margin-top:30px;display:flex;flex-direction:column;gap:22px;max-width:640px}
+.take p{font-size:21px;line-height:1.45;color:var(--ink-2)}
+.repo{margin-top:34px;font-size:18px;color:var(--ink-2)}
+.repo a{color:var(--ink);font-weight:600;text-decoration-thickness:1px;text-underline-offset:4px}
+.appx{position:absolute;right:var(--pad);top:30px;font-size:14px;color:var(--muted)}
+
+/* ================================================================ NOTES, HELP, NAV */
+.notes{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:#15171c;color:#e8e9ec;padding:18px 28px 22px;font-size:17px;line-height:1.55;transform:translateY(100%);transition:transform .25s var(--ease);z-index:20}
+.notes.show{transform:none}
+.notes .h{font-size:13px;color:#9aa0ad;margin-bottom:6px}
+.help{position:fixed;right:14px;top:12px;font-size:12.5px;color:#6b7080;z-index:21;background:rgba(245,246,248,.94);padding:5px 9px;border-radius:6px;opacity:0;transition:opacity .4s}
+.help.show{opacity:1}
+.navzone{position:absolute;top:0;bottom:0;width:10%;z-index:4;cursor:pointer}
+.navzone.l{left:0}.navzone.r{right:0}
+.embed .help,.embed .navzone,.embed .notes{display:none}
+body.embed{background:var(--paper)}
+
+/* ================================================================ PRESENTER VIEW */
+.presenter{position:fixed;inset:0;background:#111318;color:#e9eaee;display:grid;grid-template-columns:1.7fr 1fr;grid-template-rows:auto 1fr;gap:18px;padding:18px;font-family:var(--text);z-index:50}
+.presenter header{grid-column:1/3;display:flex;justify-content:space-between;align-items:baseline;font-size:15px;color:#9aa0ad}
+.presenter header b{color:#fff;font-size:28px;font-variant-numeric:tabular-nums;font-weight:600}
+.presenter .cur,.presenter .nxt{background:#000;border-radius:8px;overflow:hidden;position:relative}
+.presenter iframe{border:0;width:100%;height:100%;display:block}
+.presenter .side{display:grid;grid-template-rows:auto 1fr;gap:16px;min-height:0}
+.presenter .nxt{aspect-ratio:16/9}
+.presenter .pnotes{overflow:auto;font-size:19px;line-height:1.55;color:#e9eaee;padding:4px 6px}
+.presenter .pnotes h4{font-size:13px;color:#9aa0ad;font-weight:500;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="help">← → navigate · N notes · P presenter view · F full screen</div>
+<div class="viewport"><div class="stage" id="stage">
+<canvas id="field" aria-hidden="true"></canvas>
+<section class="slide hero" data-part="0" data-field="title" data-notes="We start from one routine blood draw per person: 2,290 American adults from the national health survey NHANES. Every dot on the right is one of them. They begin as an undifferentiated cloud and settle into four regions — that motion is the whole project in one picture: structure that is in the data, but not visible in any single number. The same 2,290 dots come back at every stage of the talk. Our question is whether those regions mean anything outside the blood.">
+  <div class="copy">
+    <h1>What a blood test knows that its patient doesn’t</h1>
+    <p class="sub">Latent metabolic phenotypes in 2,290 US adults, and what they reveal about diagnosis and money.</p>
+  </div>
+  <div class="who"><b>Scientific Visualization</b> · MSc, Università degli Studi di Milano · 2026–27<br>Behrad Sadeghi (70193A) · Data: NHANES 2017–2018, CDC</div>
+  <div class="flegend"><span><i class="k k0"></i>Low-risk</span><span><i class="k k1"></i>Inflammatory</span><span><i class="k k2"></i>Hepatic</span><span><i class="k k3"></i>Dysglycaemic</span></div>
+</section>
+
+<!-- 2 QUESTION -->
+<section class="slide" data-part="0" data-notes="The one rule we built the whole project around comes from the cluster-explanation lecture: a variable either builds the clusters or judges them — never both. Only the fourteen blood and urine biomarkers on the left enter k-means. Everything on the right — body size, blood pressure, what a doctor has told the person, income, education, insurance, food security, smoking — is held back. If the clusters still differ on the right-hand block, the partition is about people, not just about the matrix. Bottom row: Keim's three tasks, and which part of the talk does which.">
+  <h2>Do routine blood tests contain groups of people that matter beyond the blood?</h2>
+  <div class="blocks">
+    <div class="block">
+      <h3>14 biomarkers</h3>
+      <p class="role">Build the clusters. Nothing else enters k-means.</p>
+      <dl class="fam">
+        <dt>Sugar</dt><dd>fasting glucose · HbA1c · fasting insulin</dd>
+        <dt>Lipids</dt><dd>triglycerides · HDL · LDL</dd>
+        <dt>Liver</dt><dd>ALT · GGT · albumin</dd>
+        <dt>Inflammation</dt><dd>hs-CRP · white blood cells</dd>
+        <dt>Kidney</dt><dd>creatinine · uric acid · urine albumin/creatinine</dd>
+      </dl>
+    </div>
+    <div class="arrow">
+      <svg viewBox="0 0 120 24" aria-hidden="true"><path d="M2 12H112M104 4l10 8-10 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      k-means, k = 4<br>4 phenotypes
+      <svg viewBox="0 0 120 24" aria-hidden="true"><path d="M2 12H112M104 4l10 8-10 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </div>
+    <div class="block">
+      <h3>22 variables the algorithm never sees</h3>
+      <p class="role">Judge the clusters afterwards.</p>
+      <dl class="fam">
+        <dt>Body</dt><dd>age · sex · BMI · waist · blood pressure</dd>
+        <dt>Diagnoses</dt><dd>told diabetes · hypertension · high cholesterol · heart disease or stroke · liver condition</dd>
+        <dt>Money</dt><dd>income-to-poverty ratio · education · insurance · food security · usual place of care</dd>
+        <dt>Living</dt><dd>smoking (cotinine) · physical activity · self-rated health</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="tasks">
+    <div class="task"><h4>Exploratory</h4><p>What does the raw data look like, and is there structure at all?</p><p class="where">Look · Cluster</p></div>
+    <div class="task"><h4>Confirmatory</h4><p>Do the clusters differ on what they never saw — by how much, after correction?</p><p class="where">Describe · Validate · Explain</p></div>
+    <div class="task"><h4>Presentation</h4><p>One message per chart, titled with the finding.</p><p class="where">Every slide title</p></div>
+  </div>
+</section>
+
+<section class="slide opener" data-part="0" data-field="look" data-notes="NHANES combines an interview, an exam and laboratory tests. Insulin, triglycerides and LDL are measured only on the morning fasting subsample, so we keep 2,290 adults with all fourteen biomarkers and impute nothing. On the right, the same people as dots on the first two principal components: one grey cloud. The analysis is unweighted, so claims are about these people; the headline number is also reported survey-weighted.">
+  <div class="copy">
+    <div class="idx">Part 1 of 5</div>
+    <div class="name">Look</div>
+    <p class="q">2,290 adults, one fasting blood draw, fourteen numbers each.</p>
+    <p class="how">Before any model: distributions, correlations, and whether there is structure at all.</p>
+    <div class="mini">
+      <div><span>NHANES 2017–2018 participants</span><i style="width:100%"></i><b>9,254</b></div>
+      <div><span>Adults, morning fasting subsample</span><i style="width:27.5%"></i><b>2,541</b></div>
+      <div><span>Not pregnant</span><i style="width:27.2%"></i><b>2,520</b></div>
+      <div><span>Complete on all 14 biomarkers</span><i style="width:24.7%"></i><b>2,290</b></div>
+    </div>
+  </div>
+  <div class="fieldnote">Each dot is one adult, placed by the first two principal components of their 14 biomarkers.</div>
+</section>
+
+<!-- 4 DISTRIBUTIONS -->
+<section class="slide" data-part="0" data-notes="Before any model: the raw distributions. Eleven of the fourteen are right-skewed — glucose, HbA1c, CRP and the urine ratio have long tails of very high values. On a linear axis k-means would be dominated by those tails, so we log-transform the skewed ones and then standardise. The axes here are already on that log scale, but labelled in the original units so they can be read. The black line is the median; the red line is the clinical threshold a doctor would use.">
+  <h2>Eleven of fourteen biomarkers are strongly right-skewed, so we analyse them on a log scale</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f02_distributions}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p><strong>Black line:</strong> median. <strong style="color:var(--pos)">Red line:</strong> the clinical threshold.</p>
+      <p>Log axes are labelled in the original units, so a value can be read straight off.</p>
+      <p class="method">Transform: log for 11 skewed markers, then z-score; 0.3% of values beyond ±4 SD are clipped. Histograms show the central 99.6%.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 5 CORRELATION -->
+<section class="slide" data-part="0" data-notes="Rank correlations, with the rows ordered by hierarchical clustering rather than alphabetically, so that modules become visible as blocks. Glucose and HbA1c travel together; triglycerides, insulin and HDL form a lipid–insulin block; ALT and GGT a liver block; CRP and white cells an inflammation block; creatinine and uric acid a kidney block. Most correlations are moderate — nothing here is redundant enough to drop.">
+  <h2>The biomarkers travel in families: sugar, lipids and insulin, liver, inflammation, kidney</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f03_correlation}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p>Rows and columns are ordered by similarity, so families appear as warm blocks along the diagonal.</p>
+      <p>The strongest pair is glucose–HbA1c (ρ .63); HDL runs against triglycerides (−.50).</p>
+      <p class="method">Spearman ρ on the raw values · average-linkage ordering on 1 − |ρ| · diverging scale, white = 0.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 6 CLOUD -->
+<section class="slide" data-part="0" data-notes="This is the honest starting point. Projected on its first two principal components the data is one cloud with a single density peak. Mean-shift, which looks for density peaks, puts 95% of people in one mode. The first component — a general metabolic axis — carries only 24% of the variance and it takes eight components to reach 80%. So we are not discovering islands; we are cutting a continuum into regions. The real test is whether those regions mean something outside the blood.">
+  <h2>Projected onto its main axes, the data is one cloud, not islands</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f04_cloud}}</figure>
+    <aside class="note">
+      <h3>What it means</h3>
+      <p>Any clustering of this data cuts a <strong>continuum</strong> into regions. Mean-shift finds one density peak holding <strong>95%</strong> of people.</p>
+      <p>So the question becomes: do the regions mean anything the blood did not already say?</p>
+      <p class="method">PCA on the 14 standardised biomarkers · Gaussian KDE contours · mean-shift bandwidth from the 20% quantile of distances.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="slide opener" data-part="1" data-field="cluster" data-notes="The dots move from the principal-component view to a UMAP layout and take the colour of their k-means cluster. Important caveat: UMAP only draws the result; the clustering ran in all fourteen dimensions, and the distances between regions in this picture mean nothing.">
+  <div class="copy">
+    <div class="idx">Part 2 of 5</div>
+    <div class="name">Cluster</div>
+    <p class="q">Cut the cloud into regions — and test whether the cut survives.</p>
+    <p class="how">k-means with 100 restarts, a second and third method that fail differently, bootstrap stability, and one step either side of the chosen k.</p>
+    
+  </div>
+  <div class="fieldnote">UMAP layout, for display only: it keeps neighbourhoods, not distances, so the gaps between colours are not measurements.</div>
+</section>
+
+<!-- 7 K SELECTION -->
+<section class="slide" data-part="1" data-notes="Choosing k with three kinds of evidence instead of one score. Silhouette is low for every k — expected on a continuum — so it cannot choose. Stability can: we re-cluster 30 bootstrap samples and compare with the original partition. k equals 2, 3 and 4 are all stable, above 0.89; at k equals 5 stability drops to 0.77 and its worst bootstraps fall to 0.53. Agreement with a Gaussian mixture and with Ward linkage is moderate. We take k equals 4: the most detailed partition that still survives resampling.">
+  <h2>k = 4 is the most detailed partition that still survives resampling</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f05_k_selection}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p>Silhouette is low everywhere (0.11 at k = 4): consistent with a continuum, and unable to choose.</p>
+      <p>Bootstrap stability is: <strong>0.89</strong> at k = 4, <strong>0.77</strong> at k = 5.</p>
+      <p class="method">k-means, 100 restarts, seed 42 · 30 bootstrap re-fits scored by adjusted Rand index · Gaussian mixture (diagonal) and Ward linkage as methods that fail differently.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 8 ALLUVIAL -->
+<section class="slide" data-part="1" data-notes="What happens at k minus one and k plus one. At k equals 3, Inflammatory and Hepatic merge into one insulin-resistant group, and part of the Inflammatory group falls back into Low-risk. At k equals 5 almost nothing moves except one new group: older people with high creatinine, uric acid and urine albumin — a renal profile — drawn from all four clusters, most of all from Dysglycaemic. The four phenotypes are not artefacts of one k: each one persists across the neighbouring solutions.">
+  <h2>One step either side: at k = 3 two phenotypes merge, at k = 5 an older renal group splits off</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f06_alluvial}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p>Each band is a group of people; its colour is the k = 4 cluster they belong to.</p>
+      <p>At k = 5, the new grey group is <strong>older</strong> (median 71) with high creatinine and urine albumin, drawn from all four clusters.</p>
+      <p class="method">Same transform and seed at k = 3, 4, 5 · flows are exact counts.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="slide opener" data-part="2" data-field="describe" data-notes="Four regions, each named after what its biomarkers do. Everything on the next slide is description: k-means put its boundaries exactly there, so a p-value on those variables would measure the algorithm, not the patients.">
+  <div class="copy">
+    <div class="idx">Part 3 of 5</div>
+    <div class="name">Describe</div>
+    <p class="q">Name the four groups from their pattern, not from a hypothesis.</p>
+    <p class="how">Description only: the biomarkers built the clusters, so their differences are a statement about the cut, not evidence (Lecture 6b).</p>
+    
+  </div>
+  
+</section>
+
+<!-- 10 CENTROIDS -->
+<section class="slide" data-part="2" data-notes="This replaces the usual Table 1. Each cell is the cluster mean in standard deviations from the cohort mean, columns ordered by how strongly the biomarker separates the clusters. The names come from the pattern, not from a hypothesis. Low-risk: high HDL, low triglycerides, insulin and CRP. Inflammatory: CRP more than five times the Low-risk level, high white cells, low albumin, normal liver enzymes. Hepatic: ALT and GGT about double, high triglycerides and uric acid. Dysglycaemic: glucose about 195 and HbA1c 8.3%, plus urine albumin — early kidney damage. These differences are descriptive: k-means put its boundaries exactly here.">
+  <h2>Named from their pattern, not assumed in advance</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f08_centroids}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p>Cell = cluster mean in SD from the cohort mean. <span style="color:var(--pos);font-weight:600">Warm</span> above, <span style="color:var(--neg);font-weight:600">cool</span> below.</p>
+      <p><span class="k k1"></span><strong>Inflammatory:</strong> CRP 8.3 vs 1.5 mg/L in Low-risk.<br><span class="k k2"></span><strong>Hepatic:</strong> ALT 33 vs 17 U/L.<br><span class="k k3"></span><strong>Dysglycaemic:</strong> HbA1c 8.3%.</p>
+      <p class="method">Description only: these biomarkers built the clusters, so their differences are not evidence (Lecture 6b, slide 4).</p>
+    </aside>
+  </div>
+</section>
+
+<section class="slide opener" data-part="3" data-field="validate" data-notes="Now the part that can fail. Everything we test next was held back from the clustering. As a preview, the coloured dots are the 454 people whose blood meets the diabetes criteria: filled if a doctor told them, hollow if not. Watch where the hollow ones sit.">
+  <div class="copy">
+    <div class="idx">Part 4 of 5</div>
+    <div class="name">Validate</div>
+    <p class="q">Do the groups differ on 22 things the algorithm never saw?</p>
+    <p class="how">The test that can fail: diagnoses, blood pressure, self-rated health and money, with Benjamini–Hochberg correction and an effect size beside every q-value.</p>
+    
+  </div>
+  <div class="fieldnote">The 454 adults whose blood meets the diabetes criteria: <span class='dot'></span>told <span class='ring' style='margin-left:8px'></span>never told</div>
+</section>
+
+<!-- 12 VOLCANO -->
+<section class="slide" data-part="3" data-notes="Now the test that can fail. Twenty-two variables the clustering never saw, one test each — Kruskal–Wallis or chi-squared — with Benjamini–Hochberg across all twenty-two. Horizontal axis: the effect, as the standardised difference between the cluster that departs most and everyone else. Vertical: adjusted significance on a log scale. Twenty-one of twenty-two survive; only insurance does not. But look at the horizontal axis: income, smoking and education are significant and small. Diagnosis, body size and sex are large.">
+  <h2>Built from blood alone, the clusters still differ on 21 of the 22 things they never saw</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f10_volcano_external}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p>Right and high: large and certain. The grey band marks differences under 0.2 SD — <strong>too small to matter</strong> whatever the q.</p>
+      <p>Colour = the cluster that departs most. Income is real but small; diagnosis is large.</p>
+      <p class="method">Kruskal–Wallis (continuous), χ² (binary) · Benjamini–Hochberg across 22 tests · n = 1,986–2,290 per test.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 13 MULTIPLES -->
+<section class="slide" data-part="3" data-notes="The distributions behind the volcano, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
+  <h2>Diagnosis, blood pressure, self-rated health — and money — line up with the phenotypes</h2>
+  <div class="body full">
+    <figure class="fig">{{SVG:f11_external_multiples}}</figure>
+  </div>
+</section>
+
+<section class="slide" data-part="3" data-notes="This is the finding that no single variable shows. 454 adults have blood that meets the diabetes criteria — HbA1c at least 6.5% or fasting glucose at least 126. One in three of them, 143 people, say no doctor has ever told them; weighted to the US population the share is the same, 31%. Now the part only the clustering shows: most of the undiagnosed are not in the Dysglycaemic cluster. 93 of the 143 sit in the Inflammatory and Hepatic clusters, where more than half of the lab-defined diabetes is unknown to the patient.">
+  <h2>A third of lab-defined diabetes is undiagnosed — and most of it sits outside the “diabetic” cluster</h2>
+  <div class="body">
+    <div class="waffle" id="waffle"><div class="tip" id="wTip"></div></div>
+    <aside class="note">
+      <div class="big">143</div>
+      <p>of <strong>454</strong> adults meeting the lab criteria were never told — <strong>31%</strong>, also 31% survey-weighted.</p>
+      <p><strong>93 of the 143</strong> are in the <span class="k k1"></span>Inflammatory and <span class="k k2"></span>Hepatic clusters.</p>
+      <p><span class="dot"></span>told by a doctor<br><span class="ring"></span>never told</p>
+      <p class="method">One dot = one adult · hover for values · lab criteria: HbA1c ≥ 6.5% or fasting glucose ≥ 126 mg/dL · “told” from the DIQ interview.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 15 EXPLORER -->
+<section class="slide" data-part="3" data-notes="Same landscape as before; switch the view. In the second view only the 454 lab-defined diabetics stay in colour: filled if a doctor told them, hollow if not. The filled ones crowd the Dysglycaemic corner — that is diabetes as medicine already sees it: median HbA1c 7.3%. The hollow ones are spread into the neighbouring Hepatic and Inflammatory regions, with median HbA1c 6.5% — just over the line, and with a profile that looks like a fatty liver or chronic inflammation rather than like diabetes. Hover any dot for that person's values.">
+  <h2>Diagnosed diabetes looks diabetic; undiagnosed diabetes looks like its neighbours</h2>
+  <div class="explorer">
+    <div class="plot"><canvas id="exCanvas" aria-label="UMAP landscape of 2,290 adults with selectable views"></canvas><div class="tip" id="exTip"></div></div>
+    <div>
+      <div class="seg" role="group" aria-label="View">
+        <button id="m0" aria-pressed="true"><b>The four phenotypes</b>every adult, coloured by cluster</button>
+        <button id="m1" aria-pressed="false"><b>Lab-defined diabetes</b><span class="dot"></span>told by a doctor <span class="ring" style="margin-left:10px"></span>never told</button>
+      </div>
+      <div class="readout" id="exReadout"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 LIVER -->
+<section class="slide" data-part="3" data-notes="The same gap, for the liver. In the Hepatic cluster, 39% have an ALT above the upper limit of normal — the usual blood sign of fat in the liver. Only 8% have ever been told they have a liver condition. Fatty liver is common, usually silent, and strongly tied to the same insulin resistance; this is the second thing the blood knows and the patient does not.">
+  <h2>39% of the Hepatic cluster have a raised ALT; 8% have ever been told about their liver</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f13_liver}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p>Filled dot: what the blood shows. Hollow dot: what the person was told. The line between them is the gap.</p>
+      <p>The gap is widest in <span class="k k2"></span><strong>Hepatic</strong>: 31 percentage points.</p>
+      <p class="method">ALT upper limits of normal: 33 U/L men, 25 U/L women (AASLD) · 95% Wilson intervals.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="slide opener" data-part="4" data-field="explain" data-notes="Last part: models that can be read. First we check that a model can recover the clusters on patients it never saw — that is what gives us the right to read its explanation. At the end we zoom in on one person, the dot circled on the right.">
+  <div class="copy">
+    <div class="idx">Part 5 of 5</div>
+    <div class="name">Explain</div>
+    <p class="q">Which variables carry each phenotype — and why is one patient where she is?</p>
+    <p class="how">Interpretable surrogate models, earned by held-out accuracy: permutation importance, odds ratios against Low-risk, and SHAP for a single case.</p>
+    
+  </div>
+  
+</section>
+
+<!-- 17 CV -->
+<section class="slide" data-part="4" data-notes="Before reading any model, we earn the right to read it. We train interpretable classifiers to predict the cluster label from the biomarkers and score them on patients they never saw, five stratified folds. The comparison that matters is with the majority-class baseline, 0.25 balanced accuracy. Every model clears it; the L1 logistic regression recovers 98% — unsurprising, since k-means cells are separated by linear boundaries. The clusters have a consistent signature, so there is something to explain.">
+  <h2>The clusters have a consistent signature: unseen patients are recovered 98% of the time</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f14_surrogate_cv}}</figure>
+    <aside class="note">
+      <h3>Why this slide exists</h3>
+      <p>The accuracy is not the result. It is the <strong>permission</strong> to read the model’s explanation.</p>
+      <p>Near the baseline, any importance ranking would rank noise.</p>
+      <p class="method">5-fold stratified CV · class-balanced weights · balanced accuracy · same folds for every model.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 18 UNI VS MULTI -->
+<section class="slide" data-part="4" data-notes="Two kinds of evidence on one pair of axes. Horizontal: how strongly the clusters differ on a biomarker, one at a time. Vertical: how much the random forest needs it, with every other biomarker available — measured on held-out patients by shuffling it. CRP, HbA1c, glucose and ALT are both different and needed: these define the phenotypes. GGT and insulin differ strongly but are not needed: ALT and triglycerides already carry their information. LDL is neither — cholesterol, the number most people know, says almost nothing about these phenotypes.">
+  <h2>CRP, HbA1c, glucose and ALT define the phenotypes; LDL cholesterol barely matters</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f15_uni_vs_multi}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p><strong>Upper right:</strong> differs and is needed — two kinds of evidence agree.</p>
+      <p><strong>Lower right:</strong> differs, but a correlated neighbour carries it (GGT ↔ ALT, insulin ↔ triglycerides).</p>
+      <p class="method">Permutation importance on held-out folds, 10 repeats × 5 folds; bars span the 10th–90th percentile.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 19 FOREST -->
+<section class="slide" data-part="4" data-notes="Now the clinical description, using only the external block. A multinomial lasso predicts the cluster from age, sex, BMI, blood pressure, income, education, smoking, activity and diagnoses, with every cluster contrasted against Low-risk. Read as sentences. Inflammatory: heavier, more often women and smokers. Hepatic: heavier and mostly men. Dysglycaemic: heaviest and older. Note income: it differed on its own, but once BMI and sex are in the model its odds ratio shrinks to one — the income gradient travels through body weight and sex, it does not act separately.">
+  <h2>Read as sentences: who belongs to each phenotype, compared with Low-risk</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f16_forest_external}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p><span class="k k1"></span>Heavier, more often <strong>women</strong> and smokers.<br><span class="k k2"></span>Heavier, mostly <strong>men</strong>.<br><span class="k k3"></span>Heaviest and <strong>older</strong>.</p>
+      <p>Income shrinks to 1 once BMI and sex are in: its gradient travels through them.</p>
+      <p class="method">Multinomial L1 logistic, C = 0.05 by CV · balanced accuracy 0.53 vs 0.25 · n = 1,879 complete cases · hollow = shrunk to zero.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 20 SHAP -->
+<section class="slide" data-part="4" data-notes="Finally, one person. A 44-year-old woman, BMI 28, who has never been told she has diabetes. Her HbA1c is 7.3% and her fasting glucose 149. The forest gives her a 95% probability of the Dysglycaemic phenotype, and SHAP shows that almost all of it comes from those two numbers. This is the level at which the analysis becomes useful: a single blood draw already contains the reason she should be seen.">
+  <h2>One patient, never told: the two numbers that place her in the Dysglycaemic group</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f17_shap_patient}}</figure>
+    <aside class="note">
+      <h3>The patient</h3>
+      <p>Woman, <strong>44</strong>, BMI 28. Never told she has diabetes.</p>
+      <p>P(Dysglycaemic) = <strong>0.95</strong>, against a base rate of 0.25. HbA1c and glucose contribute 0.61 of it.</p>
+      <p class="method">TreeSHAP on the random forest · nine largest contributions shown · a typical case, chosen as the median HbA1c among undiagnosed Dysglycaemic patients.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 21 LIMITS -->
+<section class="slide" data-part="4" data-notes="What the pipeline does and does not establish. It establishes that these clusters differ on these variables, in this cohort, by these amounts — including on things the clustering never saw. It does not establish that the four phenotypes are natural kinds: the data is a continuum. It is cross-sectional, so there is no outcome over time. Diagnoses are self-reported. CRP is higher in women for hormonal reasons, which partly explains the sex balance of the Inflammatory group. And we did not use survey weights in the clustering, so the cluster shares are not US prevalence.">
+  <h2>What this establishes — and what it does not</h2>
+  <div class="two">
+    <div>
+      <h3>Established</h3>
+      <ul>
+        <li>Four stable regions in the biomarker space (bootstrap ARI 0.89), each persisting at k ± 1.</li>
+        <li>They differ on 21 of 22 variables they never saw, with large effects on diagnosis, BMI, sex and age.</li>
+        <li>31% of lab-defined diabetes is undiagnosed (31% weighted), concentrated outside the Dysglycaemic cluster.</li>
+        <li>A consistent signature: held-out recovery 0.98 against a 0.25 baseline.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Not established</h3>
+      <ul>
+        <li>That the phenotypes are natural groups: the data is one continuum (one density mode, silhouette 0.11).</li>
+        <li>Anything over time: NHANES is cross-sectional, with no follow-up outcome in our data.</li>
+        <li>Causation: income, sex and BMI are associations, and several act through each other.</li>
+        <li>US prevalence of the clusters: clustering is unweighted; diagnoses are self-reported.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 22 CHECKLIST -->
+<section class="slide" data-part="4" data-notes="The seven questions from the lecture on explaining clusters that every cluster analysis has to answer, with our answers. Most published analyses fail at least two; we tried not to fail any.">
+  <h2>The seven questions every cluster analysis must answer, answered</h2>
+  <table class="check">
+    <tr><td>1</td><td>Which variables built the clusters, which describe them?</td><td>14 biomarkers built them; 22 external variables describe them. No overlap.</td></tr>
+    <tr><td>2</td><td>How many clusters, chosen how, and what happens at k ± 1?</td><td>k = 4 by bootstrap stability (ARI 0.89 vs 0.77 at k = 5). k = 3 merges Inflammatory and Hepatic; k = 5 splits an older renal group.</td></tr>
+    <tr><td>3</td><td>How many tests, which correction for which family?</td><td>22 omnibus tests, Benjamini–Hochberg across variables; pairwise Mann–Whitney / Fisher with Holm within each variable.</td></tr>
+    <tr><td>4</td><td>An effect size beside every p-value?</td><td>Kruskal–Wallis ε², Cramér’s V, standardised differences, odds ratios per SD.</td></tr>
+    <tr><td>5</td><td>Cluster sizes on every figure?</td><td>810 · 581 · 660 · 239.</td></tr>
+    <tr><td>6</td><td>Can a model recover the labels on held-out patients?</td><td>Balanced accuracy 0.98 (L1 logistic), 0.92 (random forest); baseline 0.25.</td></tr>
+    <tr><td>7</td><td>What do the clusters predict that the clustering never saw?</td><td>Diagnoses, blood pressure, self-rated health, sex and income: external-only model 0.53 vs 0.25.</td></tr>
+  </table>
+</section>
+
+<section class="slide hero" data-part="4" data-field="close" data-notes="Three things to take away. One: routine biomarkers contain four stable regions, and those regions mean something outside the blood. Two: a third of lab-defined diabetes is unknown to the patient, and it does not look like diabetes — it looks like its neighbours. The rings on the right are those 143 people. Three: the income gradient is real but small, and it travels through body weight and sex. Code, data download and this presentation are in the repository. Thank you.">
+  <div class="copy" style="top:96px;width:640px">
+    <h2 style="font-size:52px;border:none;padding:0">Three things the blood knew</h2>
+    <div class="take">
+      <p><strong>Four regions, not four islands</strong> — and they differ on 21 of 22 things the clustering never saw.</p>
+      <p><strong>A third of lab-defined diabetes is undiagnosed</strong>, and most of it looks like its neighbours, not like diabetes.</p>
+      <p><strong>Money matters, modestly:</strong> the income gradient is real, small, and travels through weight and sex.</p>
+    </div>
+    <p class="repo">Code, data pipeline and slides: <a href="{{REPO}}">{{REPO_SHORT}}</a></p>
+  </div>
+  <div class="flegend"><span><i class="ring" style="border-color:var(--ink)"></i>undiagnosed diabetes (143)</span></div>
+</section>
+
+<!-- 11 PATIENTS -->
+<section class="slide" data-appendix data-part="2" data-notes="The same thing without averaging. Every row is one person — all 2,290 of them — sorted by cluster, columns sorted by separation. The blocks are visible as blocks, but so is the spread inside them, and so are the people who do not fit: the warm rows inside the cool Low-risk band. A table of means would hide all of this.">
+  <div class="appx">Appendix</div><h2>Every patient is a row: bands of colour, with real spread inside them</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f09_patients}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p>2,290 rows, one per adult, sorted by cluster and then by the first principal component.</p>
+      <p>The bands are clear on HbA1c, glucose and CRP; elsewhere there is wide overlap — a mean would hide it.</p>
+      <p class="method">Same standardised values and diverging scale as the previous slide · columns ordered by Kruskal–Wallis ε².</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 9 UMAP -->
+<section class="slide" data-appendix data-part="1" data-notes="A two-dimensional picture of the fourteen-dimensional result. Important caveat from the dimensionality-reduction lecture: UMAP preserves neighbourhoods, not distances, so the size of the gaps between regions means nothing. The clusters were computed in the full fourteen-dimensional space; UMAP only draws them. The regions touch — again, a continuum cut into four neighbourhoods.">
+  <div class="appx">Appendix</div><h2>Four neighbouring regions of one landscape, not four separate islands</h2>
+  <div class="body">
+    <figure class="fig">{{SVG:f07_umap}}</figure>
+    <aside class="note">
+      <h3>Reading it</h3>
+      <p>One dot per adult, coloured by the cluster computed in all 14 dimensions.</p>
+      <p>UMAP keeps neighbourhoods, not distances: <strong>the gaps between regions are not measurements.</strong></p>
+      <p class="method">UMAP, 30 neighbours, min_dist 0.35, seed 42 · display only, never used to cluster.</p>
+    </aside>
+  </div>
+</section>
+<div class="navzone l" id="navL" aria-hidden="true"></div><div class="navzone r" id="navR" aria-hidden="true"></div>
+<div class="rail" id="rail">
+  <span class="src">NHANES 2017–18 · n = 2,290</span>
+  <div class="steps">
+    <div class="step"><i><b></b></i><span>Look</span></div>
+    <div class="step"><i><b></b></i><span>Cluster</span></div>
+    <div class="step"><i><b></b></i><span>Describe</span></div>
+    <div class="step"><i><b></b></i><span>Validate</span></div>
+    <div class="step"><i><b></b></i><span>Explain</span></div>
+  </div>
+  <span class="count" id="count"></span>
+</div>
+</div></div>
+<div class="notes" id="notes"><div class="h" id="notesH"></div><div id="notesB"></div></div>
+<script id="pts" type="application/json">{{DATA}}</script>
+<script>
+(() => {
+  /* ============================================================ MODE
+     main: the audience deck · embed: inside the presenter view · presenter: notes + next + timer */
+  const Q = new URLSearchParams(location.search);
+  const MODE = Q.has('presenter') ? 'presenter' : Q.has('embed') ? 'embed' : 'main';
+  const OFFSET = +(Q.get('offset') || 0);
+  if (Q.get('theme')) document.documentElement.dataset.theme = Q.get('theme');
+  if (MODE === 'embed') document.body.classList.add('embed');
+
+  const stage = document.getElementById('stage');
+  const slides = [...stage.querySelectorAll('.slide')];
+  const mainCount = slides.filter(s => !s.hasAttribute('data-appendix')).length;
+  const steps = [...document.querySelectorAll('.step')];
+  const count = document.getElementById('count');
+  const rail = document.getElementById('rail');
+  const notes = document.getElementById('notes');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = reduce || Q.has('still');
+  let cur = 0;
+
+  // stagger index for entrance animation: heading, text, then figure
+  slides.forEach(s => {
+    const els = s.querySelectorAll(':scope > h2, :scope > .dek, :scope > .body > *, :scope > .blocks, :scope > .tasks, :scope > .two, :scope > .check, :scope > .explorer > *, :scope > .flow, :scope > .rules, .copy > *');
+    els.forEach((e, i) => { e.classList.add('rv'); e.style.setProperty('--i', i); });
+  });
+  // journal theme: number the figures like a paper
+  let fn = 0;
+  slides.forEach(s => { if (s.hasAttribute('data-appendix')) return; const f = s.querySelector('.fig, .waffle'); const n = s.querySelector('.note'); if (f && n) { fn++; const t = document.createElement('div'); t.className = 'fignum'; t.textContent = `Figure ${fn}`; n.prepend(t); } });
+
+  function fit() { const s = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `translate(-50%, -50%) scale(${s})`; }
+  addEventListener('resize', fit); fit();
+
+  /* ============================================================ SYNC (presenter <-> audience) */
+  const chan = 'BroadcastChannel' in window ? new BroadcastChannel('scivis-deck') : null;
+  function send(i) { try { chan && chan.postMessage({i}); localStorage.setItem('scivis-deck', JSON.stringify({i, t: Date.now()})); } catch (e) {} }
+  function onRemote(i) { if (MODE !== 'presenter') go(i + OFFSET, false, true); else pgo(i, true); }
+  chan && (chan.onmessage = e => onRemote(e.data.i));
+  addEventListener('storage', e => { if (e.key === 'scivis-deck' && e.newValue) { try { onRemote(JSON.parse(e.newValue).i); } catch (x) {} } });
+
+  /* ============================================================ NAVIGATION */
+  function go(i, push = true, remote = false) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i === cur && slides[cur].classList.contains('active')) return;
+    slides[cur].classList.remove('active');
+    cur = i;
+    const s = slides[cur];
+    void s.offsetWidth;
+    s.classList.add('active');
+    const part = +s.dataset.part;
+    // progress inside the current part
+    const inPart = slides.filter(x => +x.dataset.part === part && !x.hasAttribute('data-appendix'));
+    const k = inPart.indexOf(s);
+    steps.forEach((st, j) => { st.classList.toggle('on', j === part); st.classList.toggle('done', j < part); if (j === part) st.style.setProperty('--p', inPart.length ? (k + 1) / inPart.length : 1); });
+    const appx = s.hasAttribute('data-appendix');
+    count.textContent = appx ? 'Appendix' : `${String(cur + 1).padStart(2, '0')} / ${mainCount}`;
+    rail.style.opacity = s.classList.contains('hero') ? 0 : 1;
+    document.getElementById('notesH').textContent = `Speaker notes · slide ${cur + 1}`;
+    document.getElementById('notesB').textContent = s.dataset.notes || '';
+    if (push && MODE === 'main') history.replaceState(null, '', location.search + '#' + (cur + 1));
+    if (!remote && MODE === 'main') send(cur);
+    field.to(s.dataset.field || null);
+    s.dispatchEvent(new CustomEvent('enter'));
+  }
+  function key(e) {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); nav(+1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); nav(-1); }
+    else if (e.key === 'Home') navTo(0); else if (e.key === 'End') navTo(mainCount - 1);
+    else if (e.key.toLowerCase() === 'n') notes.classList.toggle('show');
+    else if (e.key.toLowerCase() === 'p' && MODE === 'main') window.open(location.pathname + '?presenter' + (Q.get('theme') ? '&theme=' + Q.get('theme') : '') + '#' + (cur + 1), 'scivis-presenter', 'width=1400,height=820');
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  }
+  let nav = d => go(cur + d), navTo = i => go(i);
+  if (MODE !== 'embed') addEventListener('keydown', key);
+  document.getElementById('navL').onclick = () => nav(-1);
+  document.getElementById('navR').onclick = () => nav(+1);
+  let tx = null;
+  addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive: true});
+  addEventListener('touchend', e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) nav(dx < 0 ? 1 : -1); tx = null; });
+
+  /* ============================================================ DATA */
+  const P = JSON.parse(document.getElementById('pts').textContent);
+  const COL = P.colors;
+  const pts = P.rows.map(r => ({ux: r[0], uy: r[1], px: r[2], py: r[3], c: r[4], lab: r[5], told: r[6], a1c: r[7], glu: r[8], alt: r[9], crp: r[10], age: r[11], fem: r[12]}));
+  pts.forEach((p, i) => p.i = i);
+  const PATIENT = pts[P.patient];
+  const rgb = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const GREY = rgb('#9aa0ad'), PALE = rgb('#c9ccd3'), INK = rgb('#15171c');
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = () => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  pts.forEach(p => { p.nx = 0.5 + gauss() * 0.17; p.ny = 0.5 + gauss() * 0.17; p.delay = rnd(); });
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const med = (a) => { const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
+  const centres = [0, 1, 2, 3].map(k => { const s = pts.filter(p => p.c === k); return {x: med(s.map(p => p.ux)), y: med(s.map(p => p.uy)), n: s.length}; });
+
+  /* ============================================================ THE FIELD
+     One persistent set of 2,290 dots — one per adult — that changes state at each
+     part of the argument. Motion here is data moving, not decoration.            */
+  const field = (() => {
+    const cv = document.getElementById('field');
+    const ctx = cv.getContext('2d');
+    const W = 1600, H = 900;
+    cv.width = W * 2; cv.height = H * 2; ctx.setTransform(2, 0, 0, 2, 0, 0);
+    const box = {x: W * 0.47, y: H * 0.11, w: W * 0.46, h: H * 0.72};
+    // current rendered attributes per point
+    pts.forEach(p => { p.x = p.nx; p.y = p.ny; p.col = GREY; p.a = 0.5; p.r = 2.2; p.ring = 0; });
+    let state = null, raf = null, labels = null, labelA = 0;
+    function target(st, p) {
+      const U = {x: p.ux, y: p.uy}, C = rgb(COL[p.c]);
+      switch (st) {
+        case 'title': return {...U, col: C, a: .8, r: 2.3, ring: 0};
+        case 'look': return {x: p.px, y: p.py, col: GREY, a: .55, r: 2.1, ring: 0};
+        case 'cluster': return {...U, col: C, a: .8, r: 2.3, ring: 0};
+        case 'describe': return {...U, col: C, a: .38, r: 2.1, ring: 0};
+        case 'validate': return p.lab ? {...U, col: C, a: 1, r: 3.3, ring: p.told ? 0 : 1} : {...U, col: PALE, a: .55, r: 1.7, ring: 0};
+        case 'explain': return p === PATIENT ? {...U, col: rgb(COL[3]), a: 1, r: 7, ring: 0} : {...U, col: PALE, a: .5, r: 1.8, ring: 0};
+        case 'close': return (p.lab && !p.told) ? {...U, col: INK, a: 1, r: 3.6, ring: 1} : {...U, col: C, a: .42, r: 2.2, ring: 0};
+        default: return {x: p.x, y: p.y, col: p.col, a: p.a, r: p.r, ring: p.ring};
+      }
+    }
+    const LABELS = {
+      describe: () => centres.map((c, k) => ({x: c.x, y: c.y, t: P.names[k], s: `n = ${c.n.toLocaleString()}`})),
+      explain: () => [{x: PATIENT.ux, y: PATIENT.uy, t: 'One patient, never told', s: `HbA1c ${PATIENT.a1c}% · glucose ${PATIENT.glu} mg/dL`, off: true}],
+    };
+    const X = p => box.x + p.x * box.w, Y = p => box.y + (1 - p.y) * box.h;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of pts) {
+        if (p.ring > .5) continue;
+        ctx.beginPath(); ctx.arc(X(p), Y(p), p.r, 0, 7);
+        ctx.fillStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${p.a})`; ctx.fill();
+      }
+      for (const p of pts) {
+        if (p.ring <= .5) continue;
+        ctx.beginPath(); ctx.arc(X(p), Y(p), p.r, 0, 7);
+        ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill();
+        ctx.lineWidth = 1.7; ctx.strokeStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${p.a})`; ctx.stroke();
+      }
+      if (state === 'explain' && labelA > 0) {   // a quiet halo around the one patient
+        ctx.beginPath(); ctx.arc(X(PATIENT), Y(PATIENT), 16, 0, 7); ctx.lineWidth = 1.5; ctx.strokeStyle = `rgba(21,23,28,${.6 * labelA})`; ctx.stroke();
+      }
+      if (labels && labelA > 0) {
+        ctx.globalAlpha = labelA;
+        for (const l of labels) {
+          const x = box.x + l.x * box.w + (l.off ? 26 : 0), y = box.y + (1 - l.y) * box.h + (l.off ? -26 : 0);
+          ctx.font = '600 17px "Instrument Sans", sans-serif'; ctx.textAlign = l.off ? 'left' : 'center';
+          const tw = Math.max(ctx.measureText(l.t).width, (ctx.font = '400 14px "Instrument Sans", sans-serif', ctx.measureText(l.s).width));
+          const bx = l.off ? x - 10 : x - tw / 2 - 10;
+          ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fillRect(bx, y - 22, tw + 20, 46);
+          ctx.fillStyle = '#15171c'; ctx.font = '600 17px "Instrument Sans", sans-serif'; ctx.fillText(l.t, x, y - 2);
+          ctx.fillStyle = '#4a4f5e'; ctx.font = '400 14px "Instrument Sans", sans-serif'; ctx.fillText(l.s, x, y + 16);
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+    function to(st) {
+      cv.classList.toggle('on', !!st);
+      if (!st || st === state) { if (st) { labelA = LABELS[st] ? 1 : 0; draw(); } return; }
+      const first = state === null && st === 'title';
+      state = st; labels = LABELS[st] ? LABELS[st]() : null; labelA = 0;
+      const from = pts.map(p => ({x: p.x, y: p.y, col: p.col, a: p.a, r: p.r, ring: p.ring}));
+      const goal = pts.map(p => target(st, p));
+      const dur = reduced ? 0 : (first ? 2600 : 1500), t0 = performance.now() + (first ? 450 : 120);
+      cancelAnimationFrame(raf);
+      const tick = now => {
+        const T = dur ? Math.max(0, Math.min(1, (now - t0) / dur)) : 1;
+        pts.forEach((p, i) => {
+          const local = dur ? Math.max(0, Math.min(1, T * 1.3 - p.delay * 0.3)) : 1;
+          const e = ease(local), f = from[i], g = goal[i];
+          p.x = f.x + (g.x - f.x) * e; p.y = f.y + (g.y - f.y) * e;
+          p.col = f.col.map((v, j) => Math.round(v + (g.col[j] - v) * e));
+          p.a = f.a + (g.a - f.a) * e; p.r = f.r + (g.r - f.r) * e;
+          p.ring = e > .5 ? g.ring : f.ring;
+        });
+        labelA = labels ? Math.max(0, Math.min(1, (T - .75) / .25)) : 0;
+        draw();
+        if (T < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+    return {to};
+  })();
+
+  /* ============================================================ WAFFLE (one dot = one adult) */
+  (() => {
+    const host = document.getElementById('waffle'); if (!host) return;
+    const slide = host.closest('.slide'), tip = document.getElementById('wTip');
+    const NS = 'http://www.w3.org/2000/svg';
+    const per = 12, step = 27, gx = per * step + 64;
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${4 * gx - 52} 670`); host.appendChild(svg);
+    const groups = [0, 1, 2, 3].map(k => pts.filter(p => p.c === k && p.lab).sort((a, b) => b.told - a.told));
+    const cells = [];
+    groups.forEach((g, k) => {
+      const x0 = k * gx, und = g.filter(p => !p.told).length;
+      const t = (y, txt, size, w, fill) => { const e = document.createElementNS(NS, 'text'); e.setAttribute('x', x0); e.setAttribute('y', y); e.setAttribute('font-size', size); e.setAttribute('font-weight', w); e.setAttribute('fill', fill); e.textContent = txt; svg.appendChild(e); return e; };
+      t(26, P.names[k], 28, 600, 'var(--ink)');
+      t(56, `${g.length} meet the lab criteria`, 20, 400, 'var(--ink-2)');
+      t(84, `${und} never told · ${Math.round(100 * und / g.length)}%`, 21, 600, 'var(--ink)');
+      g.forEach((p, i) => {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', x0 + 10 + (i % per) * step); c.setAttribute('cy', 122 + Math.floor(i / per) * step);
+        c.setAttribute('r', 9.4); c.setAttribute('fill', COL[k]); c.setAttribute('stroke', COL[k]); c.setAttribute('stroke-width', 2);
+        c.style.transitionDelay = '0ms';
+        svg.appendChild(c); cells.push({c, p, k, i});
+      });
+    });
+    function play() {
+      cells.forEach(({c, p}) => { c.style.transitionDelay = '0ms'; c.setAttribute('fill', COL[p.c]); });
+      if (reduced) { cells.forEach(({c, p}) => { if (!p.told) c.setAttribute('fill', '#fff'); }); return; }
+      let j = 0;
+      cells.forEach(({c, p}) => { if (!p.told) { c.style.transitionDelay = `${700 + (j++) * 9}ms`; } });
+      requestAnimationFrame(() => requestAnimationFrame(() => cells.forEach(({c, p}) => { if (!p.told) c.setAttribute('fill', '#fff'); })));
+    }
+    slide.addEventListener('enter', play);
+    svg.addEventListener('mousemove', e => {
+      const t = e.target; const cell = cells.find(x => x.c === t);
+      if (!cell) { tip.style.opacity = 0; return; }
+      const p = cell.p, r = host.getBoundingClientRect(), sc = r.width / host.offsetWidth;
+      tip.innerHTML = `<b>${P.names[p.c]}</b> · ${p.fem ? 'woman' : 'man'}, ${p.age}<br>HbA1c ${p.a1c}% · glucose ${p.glu} mg/dL<br>${p.told ? 'told by a doctor' : '<b>never told</b>'}`;
+      tip.style.left = ((e.clientX - r.left) / sc + 16) + 'px'; tip.style.top = ((e.clientY - r.top) / sc - 60) + 'px'; tip.style.opacity = 1;
+    });
+    svg.addEventListener('mouseleave', () => tip.style.opacity = 0);
+  })();
+
+  /* ============================================================ EXPLORER */
+  (() => {
+    const ex = document.getElementById('exCanvas'); if (!ex) return;
+    const tip = document.getElementById('exTip'), ro = document.getElementById('exReadout'), exSlide = ex.closest('.slide');
+    let mode = 0, mix = 0, geo = null, hovered = null, anim = null;
+    const counts = [0, 1, 2, 3].map(k => pts.filter(p => p.c === k).length);
+    const labBy = [0, 1, 2, 3].map(k => pts.filter(p => p.c === k && p.lab).length);
+    const undxBy = [0, 1, 2, 3].map(k => pts.filter(p => p.c === k && p.lab && !p.told).length);
+    function readout() {
+      ro.innerHTML = mode === 0
+        ? `<table>${P.names.map((n, k) => `<tr><td><span class="k k${k}"></span>${n}</td><td>${counts[k].toLocaleString()}</td></tr>`).join('')}</table><p style="margin-top:14px;font-size:15px;color:var(--muted)">Hover any dot for that adult’s values. UMAP, display only.</p>`
+        : `<table><tr><td></td><td style="font-weight:600;color:var(--ink-2)">never told / lab-defined</td></tr>${P.names.map((n, k) => `<tr><td><span class="k k${k}"></span>${n}</td><td>${undxBy[k]} / ${labBy[k]}</td></tr>`).join('')}<tr><td><strong>All</strong></td><td><strong>143 / 454</strong></td></tr></table><p style="margin-top:14px;font-size:15px;color:var(--muted)">Median HbA1c: told 7.3% · never told 6.5%.</p>`;
+    }
+    const mixC = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',');
+    function draw() {
+      const w = ex.offsetWidth, h = ex.offsetHeight; ex.width = w * 2; ex.height = h * 2;
+      const ctx = ex.getContext('2d'); ctx.setTransform(2, 0, 0, 2, 0, 0);
+      const m = 36, bw = w - 2 * m, bh = h - 2 * m; geo = {m, bw, bh, w, h};
+      const f = mix;
+      for (const p of pts) {
+        if (p.lab) continue;
+        ctx.beginPath(); ctx.arc(m + p.ux * bw, m + (1 - p.uy) * bh, 2.6 - f * .9, 0, 7);
+        ctx.fillStyle = `rgba(${mixC(rgb(COL[p.c]), PALE, f)},${.75 - f * .35})`; ctx.fill();
+      }
+      for (const p of pts) {
+        if (!p.lab) continue;
+        const x = m + p.ux * bw, y = m + (1 - p.uy) * bh;
+        if (f > .5 && !p.told) { ctx.beginPath(); ctx.arc(x, y, 4.4, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 1.8; ctx.strokeStyle = COL[p.c]; ctx.stroke(); }
+        else { ctx.beginPath(); ctx.arc(x, y, 2.6 + f * 1.6, 0, 7); ctx.fillStyle = COL[p.c]; ctx.fill(); if (f > .5) { ctx.lineWidth = 1; ctx.strokeStyle = '#fff'; ctx.stroke(); } }
+      }
+      if (hovered) { ctx.beginPath(); ctx.arc(m + hovered.ux * bw, m + (1 - hovered.uy) * bh, 7, 0, 7); ctx.lineWidth = 2; ctx.strokeStyle = '#15171c'; ctx.stroke(); }
+      ctx.font = '600 15px "Instrument Sans", sans-serif'; ctx.textAlign = 'center';
+      centres.forEach((c, k) => {
+        const x = m + c.x * bw, y = m + (1 - c.y) * bh, t = P.names[k], tw = ctx.measureText(t).width;
+        ctx.globalAlpha = 1 - f * .55; ctx.fillStyle = 'rgba(255,255,255,.88)'; ctx.fillRect(x - tw / 2 - 7, y - 13, tw + 14, 24);
+        ctx.fillStyle = '#15171c'; ctx.fillText(t, x, y + 5); ctx.globalAlpha = 1;
+      });
+    }
+    function setMode(k) {
+      mode = k; document.getElementById('m0').setAttribute('aria-pressed', k === 0); document.getElementById('m1').setAttribute('aria-pressed', k === 1);
+      readout();
+      const from = mix, t0 = performance.now(), dur = reduced ? 0 : 700; cancelAnimationFrame(anim);
+      const stp = now => { const t = dur ? Math.min(1, (now - t0) / dur) : 1; mix = from + (k - from) * ease(t); draw(); if (t < 1) anim = requestAnimationFrame(stp); };
+      anim = requestAnimationFrame(stp);
+    }
+    document.getElementById('m0').onclick = () => setMode(0);
+    document.getElementById('m1').onclick = () => setMode(1);
+    ex.addEventListener('mousemove', e => {
+      if (!geo) return;
+      const r = ex.getBoundingClientRect(), sc = r.width / geo.w, mx = (e.clientX - r.left) / sc, my = (e.clientY - r.top) / sc;
+      let best = null, bd = 100;
+      for (const p of pts) { if (mode === 1 && !p.lab) continue; const dd = (geo.m + p.ux * geo.bw - mx) ** 2 + (geo.m + (1 - p.uy) * geo.bh - my) ** 2; if (dd < bd) { bd = dd; best = p; } }
+      hovered = best; draw();
+      if (best) {
+        tip.innerHTML = `<b>${P.names[best.c]}</b> · ${best.fem ? 'woman' : 'man'}, ${best.age}<br>HbA1c ${best.a1c}% · glucose ${best.glu} mg/dL<br>ALT ${best.alt} U/L · CRP ${best.crp} mg/L` + (best.lab ? `<br>${best.told ? 'told by a doctor' : '<b>never told</b>'} of diabetes` : '');
+        const x = geo.m + best.ux * geo.bw, y = geo.m + (1 - best.uy) * geo.bh;
+        tip.style.left = Math.min(x + 14, geo.w - 260) + 'px'; tip.style.top = Math.max(y - 70, 6) + 'px'; tip.style.opacity = 1;
+      } else tip.style.opacity = 0;
+    });
+    ex.addEventListener('mouseleave', () => { hovered = null; tip.style.opacity = 0; draw(); });
+    exSlide.addEventListener('enter', () => setTimeout(() => { readout(); draw(); if (Q.get('ex') === '1') setMode(1); }, 30));
+  })();
+
+  /* ============================================================ PRESENTER VIEW */
+  let pcur = 0;
+  function pgo(i, remote = false) {
+    pcur = Math.max(0, Math.min(slides.length - 1, i));
+    const s = slides[pcur];
+    document.getElementById('pCount').textContent = `${pcur + 1} / ${mainCount}`;
+    document.getElementById('pTitle').textContent = (s.querySelector('h2, h1, .name') || {}).textContent || '';
+    document.getElementById('pNotes').textContent = s.dataset.notes || '';
+    if (!remote) send(pcur);
+  }
+  if (MODE === 'presenter') {
+    const th = Q.get('theme') ? '&theme=' + Q.get('theme') : '';
+    const start = Math.max(0, (parseInt(location.hash.slice(1)) || 1) - 1);
+    const ui = document.createElement('div'); ui.className = 'presenter';
+    ui.innerHTML = `<header><span>Presenter view · <span id="pTitle"></span></span><span><b id="pClock">00:00</b> &nbsp; <span id="pCount"></span></span></header>
+      <div class="cur"><iframe src="${location.pathname}?embed${th}#${start + 1}" title="Current slide"></iframe></div>
+      <div class="side"><div class="nxt"><iframe src="${location.pathname}?embed&offset=1${th}#${start + 2}" title="Next slide"></iframe></div>
+      <div class="pnotes"><h4>Notes</h4><div id="pNotes"></div></div></div>`;
+    document.body.appendChild(ui);
+    document.querySelector('.viewport').style.display = 'none';
+    const t0 = Date.now(); setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); document.getElementById('pClock').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 1000);
+    nav = d => pgo(pcur + d); navTo = i => pgo(i);
+    pgo(start);
+    return;
+  }
+
+  const help = document.querySelector('.help');
+  if (MODE === 'main') { help.classList.add('show'); setTimeout(() => help.classList.remove('show'), 4500); }
+  const start = parseInt(location.hash.slice(1)) - 1;
+  cur = isNaN(start) ? 0 : Math.max(0, Math.min(slides.length - 1, start));
+  slides.forEach(s => s.classList.remove('active'));
+  const first = cur; cur = first === 0 ? 1 : 0; go(first, false, true);
+})();
+</script>
+</body>
+</html>
