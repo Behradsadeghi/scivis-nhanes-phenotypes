@@ -684,10 +684,126 @@ def export_deck_data():
            "rows": rows, "names": NAMES, "colors": CL, "patient": int(pat["index"])}
     (ROOT / "results" / "deck_points.json").write_text(json.dumps(out, separators=(",", ":")))
 
+def f_hypothesis():
+    """A hypothesis brought from domain knowledge, checked on the raw data: HbA1c rises with age."""
+    h = pd.read_csv(RES / "hypothesis_age_hba1c.csv")
+    H = json.load(open(RES / "headline_numbers.json"))["hypothesis"]
+    decs = list(h.decade)
+    dd = d.copy()
+    dd["dec"] = pd.cut(dd.age, bins=[19, 29, 39, 49, 59, 69, 79, 200], labels=decs)
+    fig = plt.figure(figsize=(14, 5.6))
+    ax = fig.add_axes([0.0, 0.1, 0.5, 0.78])
+    rng = np.random.default_rng(3)
+    for i, lab in enumerate(decs):
+        y = dd.hba1c[dd.dec == lab].clip(upper=12)
+        ax.scatter(i + rng.uniform(-0.3, 0.3, len(y)), y, s=4, color=CLOUD, alpha=0.35, lw=0, zorder=1)
+    ax.set_yscale("log")
+    for v, lab, c in [(6.5, "6.5% diabetes", POS), (5.7, "5.7% prediabetes", INK2)]:
+        ax.axhline(v, color=c, lw=1, zorder=2)
+        ax.text(-0.45, v * 1.012, lab, color=c, fontsize=11, ha="left", va="bottom",
+                bbox=dict(boxstyle="square,pad=0.15", fc="white", ec="none", alpha=0.85), zorder=5)
+    ax.vlines(range(len(decs)), h.hba1c_q1, h.hba1c_q3, color=INK, lw=4, zorder=3)
+    ax.plot(range(len(decs)), h.hba1c_median, color=INK, lw=1.4, zorder=3)
+    ax.scatter(range(len(decs)), h.hba1c_median, s=60, color=INK, edgecolors="white", lw=1.4, zorder=4)
+    ax.set_yticks([4, 5, 6, 7, 8, 10, 12])
+    ax.set_yticklabels(["4", "5", "6", "7", "8", "10", "≥12"])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylim(4, 12.6)
+    ax.set_xticks(range(len(decs)))
+    ax.set_xticklabels(decs)
+    ax.set_xlabel("age (years; NHANES top-codes age at 80)")
+    grid(ax)
+    head(ax, "HbA1c by age", f"each dot one adult · median and IQR · log scale · Spearman ρ {H['spearman']:.2f} "
+         f"[{H['spearman_lo']:.2f}, {H['spearman_hi']:.2f}]")
+
+    ax2 = fig.add_axes([0.6, 0.1, 0.38, 0.78])
+    x = np.arange(len(decs))
+    ax2.fill_between(x, h.told_p, h.lab_p, color=HAIR, alpha=0.7, lw=0)
+    ax2.errorbar(x, h.lab_p, yerr=[h.lab_p - h.lab_lo, h.lab_hi - h.lab_p], color=INK, lw=1.8, marker="o",
+                 ms=7, mec="white", mew=1.3, capsize=0, zorder=3)
+    ax2.errorbar(x + 0.08, h.told_p, yerr=[h.told_p - h.told_lo, h.told_hi - h.told_p], color=MUTED, lw=1.8,
+                 marker="o", ms=7, mec="white", mew=1.3, capsize=0, zorder=3)
+    ax2.annotate("blood meets the diabetes criteria", (3, h.lab_p[3]), (0.2, 0.36), fontsize=11, color=INK,
+                 arrowprops=dict(arrowstyle="-", color=INK, lw=0.8))
+    ax2.annotate("told by a doctor", (3.08, h.told_p[3]), (3.6, 0.07), fontsize=11, color=INK2,
+                 arrowprops=dict(arrowstyle="-", color=INK2, lw=0.8))
+    ax2.annotate("the gap: never told", (4.5, (h.lab_p[4] + h.told_p[4] + h.lab_p[5] + h.told_p[5]) / 4), (4.1, 0.45),
+                 fontsize=11, color=INK, weight=600, arrowprops=dict(arrowstyle="-", color=INK2, lw=0.8))
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(decs)
+    ax2.set_ylim(0, 0.5)
+    ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.0%}"))
+    ax2.set_xlabel("age (years)")
+    grid(ax2)
+    head(ax2, "Diabetes in the blood vs. diabetes diagnosed", "share of each age group · 95% Wilson intervals")
+    save(fig, "f02b_hypothesis_age")
+
+
+def f_vs_lowrisk():
+    """Every phenotype set against Low-risk = 1: one scale for every variable (Few: divide by the reference)."""
+    r = pd.read_csv(RES / "ratios_vs_lowrisk.csv")
+    sections = [("Diagnoses and self-rated health", ["dx_diabetes", "dx_cvd", "dx_hypertension", "dx_liver", "fair_poor_health"]),
+                ("Body", ["age", "bmi", "sbp", "female"]),
+                ("Money and education", ["income_poverty_ratio", "food_insecure", "college"])]
+    name = {"dx_diabetes": "Told: diabetes", "dx_cvd": "Heart disease or stroke", "dx_hypertension": "Told: hypertension",
+            "dx_liver": "Told: liver condition", "fair_poor_health": "Fair or poor self-rated health",
+            "age": "Age (median)", "bmi": "BMI (median)", "sbp": "Systolic BP (median)", "female": "Share of women",
+            "income_poverty_ratio": "Income / poverty line (median)", "food_insecure": "Food insecure", "college": "Some college"}
+
+    def ref_txt(v, x):
+        return {"age": f"{x:.0f} y", "bmi": f"{x:.1f} kg/m²", "sbp": f"{x:.0f} mmHg",
+                "income_poverty_ratio": f"{x:.2f}×"}.get(v, f"{x:.0%}")
+
+    rows = []
+    for sec, vs in sections:
+        rows.append(("H", sec))
+        rows += [("V", v) for v in vs]
+    fig, ax = plt.subplots(figsize=(12.6, 5.9))
+    ax.set_xscale("log")
+    xmin, xmax = 0.3, 22
+    ax.set_xlim(xmin, xmax)
+    y = 0
+    ys = {}
+    for kind, v in rows:
+        if kind == "H":
+            y += 0.45
+            ax.text(-0.52, y, v, transform=ax.get_yaxis_transform(), fontsize=13.5, weight=600, color=INK, va="center", ha="left")
+            ax.text(-0.012, y, "Low-risk value", transform=ax.get_yaxis_transform(), fontsize=10, color=MUTED, va="center", ha="right") if v.startswith("Diag") else None
+            y += 0.75
+            continue
+        ys[v] = y
+        s = r[r.variable == v]
+        ax.text(-0.012, y, ref_txt(v, s.ref_value.iloc[0]), transform=ax.get_yaxis_transform(), fontsize=12,
+                color=MUTED, va="center", ha="right")
+        ax.text(-0.17, y, name[v], transform=ax.get_yaxis_transform(), fontsize=13, color=INK, va="center", ha="right")
+        for _, q in s.iterrows():
+            k = int(q.cluster)
+            yy = y + (k - 2) * 0.24
+            ax.plot([q.lo, q.hi], [yy, yy], color=CL[k], lw=2, solid_capstyle="round", alpha=0.85)
+            ax.scatter(q.ratio, yy, s=46, color=CL[k], edgecolors="white", lw=1.1, zorder=3)
+            if q.ratio >= 2.3 or q.ratio <= 0.5:
+                ax.text(q.hi * 1.07, yy, f"{q.ratio:.1f}×", fontsize=12, color=INK, va="center")
+        y += 1
+    ax.axvline(1, color=INK, lw=1.2, zorder=2)
+    ax.text(1.04, 0.2, "Low-risk = 1", fontsize=11, color=INK, va="center")
+    ax.set_ylim(y - 0.4, -0.2)
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    ticks = [0.5, 1, 2, 5, 10, 20]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(["0.5×", "1×", "2×", "5×", "10×", "20×"])
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    grid(ax, "x")
+    ax.set_xlabel("ratio to the Low-risk group (Low-risk = 1) · log scale · 95% bootstrap intervals, 1,000 resamples")
+    handles = [plt.Line2D([], [], marker="o", ls="", color=CL[k], ms=8) for k in (1, 2, 3)]
+    ax.legend(handles, [NAMES[k] for k in (1, 2, 3)], loc="upper right", ncol=3, fontsize=11.5, handletextpad=0.3,
+              columnspacing=1.4, bbox_to_anchor=(1, 1.08))
+    save(fig, "f11b_vs_lowrisk")
+
 
 ALL = [export_deck_data, f_distributions, f_correlation, f_cloud, f_ksel, f_alluvial, f_umap, f_centroids,
        f_patients, f_volcano, f_external_multiples, f_undiagnosed, f_liver, f_cv, f_uni_multi,
-       f_forest, f_shap]
+       f_forest, f_shap, f_hypothesis, f_vs_lowrisk]
 
 if __name__ == "__main__":
     want = sys.argv[1:]

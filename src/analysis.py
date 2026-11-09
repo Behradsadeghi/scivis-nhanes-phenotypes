@@ -353,3 +353,66 @@ json.dump(patient, open(RES / "shap_patient.json", "w"), indent=2)
 
 json.dump(hid, open(RES / "headline_numbers.json", "w"), indent=2)
 print(json.dumps(hid, indent=2))
+
+# ============================================================================
+# Two additions requested by the course brief (lecture of Nov 2026):
+#  (A) a hypothesis brought from domain knowledge, checked on the RAW data
+#      before any model: "HbA1c rises with age" (the professor's own example)
+#  (B) every phenotype set against one reference group (Low-risk = 1), so that
+#      all variables share ONE scale (Few's small-multiples / "divide by mine")
+# ============================================================================
+DEC_LABELS = ["20–29", "30–39", "40–49", "50–59", "60–69", "70–79", "80+"]
+d["age_decade"] = pd.cut(d.age, bins=[19, 29, 39, 49, 59, 69, 79, 200], labels=DEC_LABELS)
+
+hyp_rows = []
+for lab_ in DEC_LABELS:
+    s = d[d.age_decade == lab_]
+    p_lab, lo_lab, hi_lab, n = prop_ci(s.lab_diabetes)
+    p_dx, lo_dx, hi_dx, _ = prop_ci(s.dx_diabetes)
+    hyp_rows.append(dict(decade=lab_, n=n, hba1c_median=s.hba1c.median(),
+                         hba1c_q1=s.hba1c.quantile(.25), hba1c_q3=s.hba1c.quantile(.75),
+                         lab_p=p_lab, lab_lo=lo_lab, lab_hi=hi_lab,
+                         told_p=p_dx, told_lo=lo_dx, told_hi=hi_dx))
+pd.DataFrame(hyp_rows).to_csv(RES / "hypothesis_age_hba1c.csv", index=False)
+
+
+def boot_rho(x, y, B=1000):
+    x, y = np.asarray(x), np.asarray(y)
+    r = [stats.spearmanr(x[i], y[i])[0] for i in (rng.integers(0, len(x), len(x)) for _ in range(B))]
+    return float(stats.spearmanr(x, y)[0]), float(np.percentile(r, 2.5)), float(np.percentile(r, 97.5))
+
+
+rho, rlo, rhi = boot_rho(d.age, d.hba1c)
+nomed = d[d.on_diabetes_meds != 1]
+rho2, rlo2, rhi2 = boot_rho(nomed.age, nomed.hba1c)
+h_kw, p_kw = stats.kruskal(*[d.hba1c[d.age_decade == l_] for l_ in DEC_LABELS])
+hid["hypothesis"] = dict(
+    spearman=rho, spearman_lo=rlo, spearman_hi=rhi,
+    spearman_no_meds=rho2, spearman_no_meds_lo=rlo2, spearman_no_meds_hi=rhi2, n_no_meds=int(len(nomed)),
+    kw_eps2=float(eps2_kw(h_kw, len(d))), kw_p=float(p_kw))
+
+# (B) ratio to the Low-risk group, with bootstrap intervals (each cluster resampled on its own)
+RATIO_VARS = [("dx_diabetes", "share"), ("dx_cvd", "share"), ("dx_hypertension", "share"),
+              ("dx_liver", "share"), ("fair_poor_health", "share"),
+              ("age", "median"), ("bmi", "median"), ("sbp", "median"), ("female", "share"),
+              ("income_poverty_ratio", "median"), ("food_insecure", "share"), ("college", "share")]
+
+
+def stat_(x, kind):
+    return np.nanmean(x) if kind == "share" else np.nanmedian(x)
+
+
+ratio_rows = []
+for v, kind in RATIO_VARS:
+    groups = [d[v][d.cluster == k].dropna().values for k in range(K)]
+    ref = stat_(groups[0], kind)
+    boots_ref = np.array([stat_(rng.choice(groups[0], len(groups[0])), kind) for _ in range(1000)])
+    for k in range(1, K):
+        est = stat_(groups[k], kind) / ref
+        bk = np.array([stat_(rng.choice(groups[k], len(groups[k])), kind) for _ in range(1000)])
+        r = bk / boots_ref
+        ratio_rows.append(dict(variable=v, kind=kind, cluster=k, ref_value=ref, value=stat_(groups[k], kind),
+                               ratio=est, lo=np.percentile(r, 2.5), hi=np.percentile(r, 97.5)))
+pd.DataFrame(ratio_rows).to_csv(RES / "ratios_vs_lowrisk.csv", index=False)
+json.dump(hid, open(RES / "headline_numbers.json", "w"), indent=2)
+print(json.dumps(hid["hypothesis"], indent=2))
