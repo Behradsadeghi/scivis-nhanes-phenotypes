@@ -272,7 +272,7 @@ body.embed{background:var(--paper)}
     <div class="idx">Part 1 of 5</div>
     <div class="name">Look</div>
     <p class="q">2,290 adults, one fasting blood draw, fourteen numbers each.</p>
-    <p class="how">Before any model: distributions, correlations, and whether there is structure at all.</p>
+    <p class="how">Before any model: distributions, one hypothesis we brought, correlations, and whether there is structure at all.</p>
     <div class="mini">
       <div><span>NHANES 2017–2018 participants</span><i style="width:100%"></i><b>9,254</b></div>
       <div><span>Adults, morning fasting subsample</span><i style="width:27.5%"></i><b>2,541</b></div>
@@ -293,6 +293,19 @@ body.embed{background:var(--paper)}
       <p><strong>Black line:</strong> median. <strong style="color:var(--pos)">Red line:</strong> the clinical threshold.</p>
       <p>Log axes are labelled in the original units, so a value can be read straight off.</p>
       <p class="method">Transform: log for 11 skewed markers, then z-score; 0.3% of values beyond ±4 SD are clipped. Histograms show the central 99.6%.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="slide" data-part="0" data-notes="Before clustering anything, we tested one hypothesis we brought from what is known about the subject — type 2 diabetes becomes more common with age, so HbA1c, the three-month average of blood sugar, should rise with age. Here it is on the raw data, one dot per adult. It holds: the median rises from 5.3% in the twenties to 5.9% in the sixties, and the share whose blood meets the diabetes criteria goes from 2% to 38%. Spearman rho is 0.48; it stays at 0.43 if we drop people on diabetes medication, whose HbA1c is lowered by treatment. The right panel shows something we did not expect at this stage: in every age group, fewer people have been told they have diabetes than have it in their blood. One variable at a time can show that the gap exists, but not who these people are. For that we need all fourteen biomarkers at once — which is where the next slides go.">
+  <h2>Our hypothesis holds in the raw data: HbA1c rises with age — and so does a gap between blood and diagnosis</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f02b_hypothesis_age}}</figure>
+    <aside class="note row">
+      <h3>The hypothesis</h3>
+      <p>Type 2 diabetes grows with age, so HbA1c should too. It does: median <strong>5.3% → 5.9%</strong>, diabetes in the blood <strong>2% → 38%</strong>. ρ stays 0.43 without people on diabetes medication.</p>
+      <p>What one variable cannot show: <strong>who</strong> is in the grey gap. That needs all 14 biomarkers at once.</p>
+      <p class="method">Spearman ρ with 1,000 bootstrap resamples · Kruskal–Wallis across age groups, ε² 0.24 · Wilson intervals · age is held out of the clustering and used here only to explore.</p>
     </aside>
   </div>
 </section>
@@ -415,21 +428,27 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 13 MULTIPLES -->
-<section class="slide" data-part="3" data-notes="The distributions behind the volcano, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
-  <h2>Diagnosis, blood pressure, self-rated health — and money — line up with the phenotypes</h2>
-  <div class="body full">
-    <figure class="fig">{{SVG:f11_external_multiples}}</figure>
+<section class="slide" data-part="3" data-notes="Same tests, now with one scale for everything. Following the slicer-dicer example from class, we take the Low-risk group as the reference and divide every other group by it, so one means as common as in Low-risk, two means twice as common. The grey numbers are the Low-risk values the ratios are relative to. Read the top block: every phenotype carries more diagnoses than Low-risk, and Dysglycaemic carries diagnosed diabetes thirteen times as often, heart disease or stroke 3.4 times. The age row is our hypothesis again: the Dysglycaemic group is 31% older. The bottom block is money: the Inflammatory group has a 25% lower income-to-poverty ratio and more food insecurity. These ratios are unadjusted; the forest plot later asks which of them survive when they are considered together. And keep the first row in mind — told diabetes is what doctors already know. The next slide is about what they do not.">
+  <h2>Against the Low-risk group, every phenotype carries more disease — and the Inflammatory one less money</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f11b_vs_lowrisk}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p>One scale for every variable: each dot is a phenotype’s value <strong>divided by Low-risk’s</strong>. Right of the line means more than Low-risk.</p>
+      <p><span class="k k3"></span>Diagnosed diabetes <strong>13×</strong>, heart disease or stroke <strong>3.4×</strong>, and 31% older — the age hypothesis again.<br><span class="k k1"></span>Income <strong>25% lower</strong>, fair or poor health 1.9×.</p>
+      <p class="method">Shares: ratio of proportions; age, BMI, BP, income: ratio of medians · 95% bootstrap intervals · unadjusted — the forest plot adjusts.</p>
+    </aside>
   </div>
 </section>
 
-<section class="slide" data-part="3" data-notes="This is the finding that no single variable shows. 454 adults have blood that meets the diabetes criteria — HbA1c at least 6.5% or fasting glucose at least 126. One in three of them, 143 people, say no doctor has ever told them; weighted to the US population the share is the same, 31%. Now the part only the clustering shows: most of the undiagnosed are not in the Dysglycaemic cluster. 93 of the 143 sit in the Inflammatory and Hepatic clusters, where more than half of the lab-defined diabetes is unknown to the patient.">
+<section class="slide" data-part="3" data-notes="This is where the gap from our age hypothesis comes back — and this time we can say where it is. This is the finding that no single variable shows. 454 adults have blood that meets the diabetes criteria — HbA1c at least 6.5% or fasting glucose at least 126. One in three of them, 143 people, say no doctor has ever told them; weighted to the US population the share is the same, 31%. Now the part only the clustering shows: most of the undiagnosed are not in the Dysglycaemic cluster. 93 of the 143 sit in the Inflammatory and Hepatic clusters, where more than half of the lab-defined diabetes is unknown to the patient.">
   <h2>A third of lab-defined diabetes is undiagnosed — and most of it sits outside the “diabetic” cluster</h2>
   <div class="body">
     <div class="waffle" id="waffle"><div class="tip" id="wTip"></div></div>
     <aside class="note">
       <div class="big">143</div>
       <p>of <strong>454</strong> adults meeting the lab criteria were never told — <strong>31%</strong>, also 31% survey-weighted.</p>
-      <p><strong>93 of the 143</strong> are in the <span class="k k1"></span>Inflammatory and <span class="k k2"></span>Hepatic clusters.</p>
+      <p><strong>93 of the 143</strong> are in the <span class="k k1"></span>Inflammatory and <span class="k k2"></span>Hepatic clusters — the gap we saw by age, now located.</p>
       <p><span class="dot"></span>told by a doctor<br><span class="ring"></span>never told</p>
       <p class="method">One dot = one adult · hover for values · lab criteria: HbA1c ≥ 6.5% or fasting glucose ≥ 126 mg/dL · “told” from the DIQ interview.</p>
     </aside>
@@ -505,7 +524,7 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 19 FOREST -->
-<section class="slide" data-part="4" data-notes="Now the clinical description, using only the external block. A multinomial lasso predicts the cluster from age, sex, BMI, blood pressure, income, education, smoking, activity and diagnoses, with every cluster contrasted against Low-risk. Read as sentences. Inflammatory: heavier, more often women and smokers. Hepatic: heavier and mostly men. Dysglycaemic: heaviest and older. Note income: it differed on its own, but once BMI and sex are in the model its odds ratio shrinks to one — the income gradient travels through body weight and sex, it does not act separately.">
+<section class="slide" data-part="4" data-notes="Now the clinical description, using only the external block. A multinomial lasso predicts the cluster from age, sex, BMI, blood pressure, income, education, smoking, activity and diagnoses, with every cluster contrasted against Low-risk. Read as sentences. Inflammatory: heavier, more often women and smokers. Hepatic: heavier and mostly men. Dysglycaemic: heaviest and older. Compare with the ratio slide in the Validate part, where each variable stood alone: there the Inflammatory group had a 25% lower income. Here, once BMI and sex are in the model, the income odds ratio shrinks to one — the income gradient travels through body weight and sex, it does not act separately.">
   <h2>Read as sentences: who belongs to each phenotype, compared with Low-risk</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f16_forest_external}}</figure>
@@ -558,18 +577,7 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 22 CHECKLIST -->
-<section class="slide" data-part="4" data-notes="The seven questions from the lecture on explaining clusters that every cluster analysis has to answer, with our answers. Most published analyses fail at least two; we tried not to fail any.">
-  <h2>The seven questions every cluster analysis must answer, answered</h2>
-  <table class="check">
-    <tr><td>1</td><td>Which variables built the clusters, which describe them?</td><td>14 biomarkers built them; 22 external variables describe them. No overlap.</td></tr>
-    <tr><td>2</td><td>How many clusters, chosen how, and what happens at k ± 1?</td><td>k = 4 by bootstrap stability (ARI 0.89 vs 0.77 at k = 5). k = 3 merges Inflammatory and Hepatic; k = 5 splits an older renal group.</td></tr>
-    <tr><td>3</td><td>How many tests, which correction for which family?</td><td>22 omnibus tests, Benjamini–Hochberg across variables; pairwise Mann–Whitney / Fisher with Holm within each variable.</td></tr>
-    <tr><td>4</td><td>An effect size beside every p-value?</td><td>Kruskal–Wallis ε², Cramér’s V, standardised differences, odds ratios per SD.</td></tr>
-    <tr><td>5</td><td>Cluster sizes on every figure?</td><td>810 · 581 · 660 · 239.</td></tr>
-    <tr><td>6</td><td>Can a model recover the labels on held-out patients?</td><td>Balanced accuracy 0.98 (L1 logistic), 0.92 (random forest); baseline 0.25.</td></tr>
-    <tr><td>7</td><td>What do the clusters predict that the clustering never saw?</td><td>Diagnoses, blood pressure, self-rated health, sex and income: external-only model 0.53 vs 0.25.</td></tr>
-  </table>
-</section>
+
 
 <section class="slide hero" data-part="4" data-field="close" data-notes="Three things to take away. One: routine biomarkers contain four stable regions, and those regions mean something outside the blood. Two: a third of lab-defined diabetes is unknown to the patient, and it does not look like diabetes — it looks like its neighbours. The rings on the right are those 143 people. Three: the income gradient is real but small, and it travels through body weight and sex. Code, data download and this presentation are in the repository. Thank you.">
   <div class="copy" style="top:96px;width:640px">
@@ -609,6 +617,26 @@ body.embed{background:var(--paper)}
       <p>UMAP keeps neighbourhoods, not distances: <strong>the gaps between regions are not measurements.</strong></p>
       <p class="method">UMAP, 30 neighbours, min_dist 0.35, seed 42 · display only, never used to cluster.</p>
     </aside>
+  </div>
+</section>
+
+<section class="slide" data-appendix data-part="4" data-notes="The seven questions from the lecture on explaining clusters that every cluster analysis has to answer, with our answers. Most published analyses fail at least two; we tried not to fail any.">
+  <div class="appx">Appendix</div><h2>The seven questions every cluster analysis must answer, answered</h2>
+  <table class="check">
+    <tr><td>1</td><td>Which variables built the clusters, which describe them?</td><td>14 biomarkers built them; 22 external variables describe them. No overlap.</td></tr>
+    <tr><td>2</td><td>How many clusters, chosen how, and what happens at k ± 1?</td><td>k = 4 by bootstrap stability (ARI 0.89 vs 0.77 at k = 5). k = 3 merges Inflammatory and Hepatic; k = 5 splits an older renal group.</td></tr>
+    <tr><td>3</td><td>How many tests, which correction for which family?</td><td>22 omnibus tests, Benjamini–Hochberg across variables; pairwise Mann–Whitney / Fisher with Holm within each variable.</td></tr>
+    <tr><td>4</td><td>An effect size beside every p-value?</td><td>Kruskal–Wallis ε², Cramér’s V, standardised differences, odds ratios per SD.</td></tr>
+    <tr><td>5</td><td>Cluster sizes on every figure?</td><td>810 · 581 · 660 · 239.</td></tr>
+    <tr><td>6</td><td>Can a model recover the labels on held-out patients?</td><td>Balanced accuracy 0.98 (L1 logistic), 0.92 (random forest); baseline 0.25.</td></tr>
+    <tr><td>7</td><td>What do the clusters predict that the clustering never saw?</td><td>Diagnoses, blood pressure, self-rated health, sex and income: external-only model 0.53 vs 0.25.</td></tr>
+  </table>
+</section>
+
+<section class="slide" data-appendix data-part="3" data-notes="The distributions behind the volcano, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
+  <div class="appx">Appendix</div><h2>The distributions behind the ratios: each variable on its own scale</h2>
+  <div class="body full">
+    <figure class="fig">{{SVG:f11_external_multiples}}</figure>
   </div>
 </section>
 <div class="navzone l" id="navL" aria-hidden="true"></div><div class="navzone r" id="navR" aria-hidden="true"></div>
