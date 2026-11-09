@@ -41,5 +41,16 @@
   "n": 2290,
   "external_model_balanced_acc": 0.5323529356839707,
   "external_model_C": 0.05,
-  "external_model_n": 1879
+  "external_model_n": 1879,
+  "hypothesis": {
+    "spearman": 0.47647958651056105,
+    "spearman_lo": 0.4454096872120347,
+    "spearman_hi": 0.505372164616673,
+    "spearman_no_meds": 0.4266472820863323,
+    "spearman_no_meds_lo": 0.38955042032644605,
+    "spearman_no_meds_hi": 0.4630598278183448,
+    "n_no_meds": 1910,
+    "kw_eps2": 0.2437327648034641,
+    "kw_p": 2.7910267198977586e-117
+  }
 }
