@@ -14,7 +14,7 @@ With GitHub Pages enabled on this repo, it is served at `https://<user>.github.i
 | **N** | speaker notes under the slide |
 | **F** | full screen |
 
-Slides 15 and 16 are interactive (hover a dot for that adult's values; switch the view on slide 16).
+Slides 16 and 17 are interactive (hover a dot for that adult's values; switch the view on slide 17).
 
 ---
 
