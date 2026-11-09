@@ -4,7 +4,7 @@
 Scientific Visualization · MSc Computer Science · Università degli Studi di Milano · 2026–27
 Behrad Sadeghi · Mohammad Ali Noroozshad · Saba Shafiei Sabet
 
-**Presentation:** [`presentation/index.html`](presentation/index.html) — a single self-contained file (25 slides + 2 appendix). A static backup is in [`presentation/slides.pdf`](presentation/slides.pdf).
+**Presentation:** [`presentation/index.html`](presentation/index.html) — a single self-contained file (25 slides + 4 appendix). A static backup is in [`presentation/slides.pdf`](presentation/slides.pdf).
 With GitHub Pages enabled on this repo, it is served at `https://<user>.github.io/<repo>/`.
 
 | Key | Action |
@@ -51,6 +51,7 @@ pip install -r requirements.txt
 
 ## Main results
 
+* **A hypothesis checked on the raw data first** — from domain knowledge, HbA1c should rise with age. It does (Spearman ρ 0.48 [0.45, 0.51]; 0.43 without people on diabetes medication), and the raw data already shows a gap between diabetes in the blood and diabetes diagnosed, growing with age. One variable shows that the gap exists; the clustering later shows where it is.
 * **Four stable phenotypes** — Low-risk (810), Inflammatory (581), Hepatic (660), Dysglycaemic (239). Bootstrap ARI 0.89 at k = 4 vs 0.77 at k = 5. At k = 3 Inflammatory and Hepatic merge; at k = 5 an older renal group splits off.
 * **The data is a continuum** (one density mode holds 95% of people, silhouette 0.11): the clusters are regions, not islands — said explicitly.
 * **They differ on 21 of 22 variables they never saw** (BH-adjusted), with large effects on diagnosis, BMI, sex and age, and small but real ones on income and food insecurity.
@@ -63,6 +64,7 @@ pip install -r requirements.txt
 * **One object through the whole talk** — the same 2,290 dots (one per adult) open each of the five parts and change state with the argument: a grey PCA cloud (Look), coloured UMAP regions (Cluster), named regions (Describe), the 454 lab-defined diabetics filled/hollow (Validate), one patient (Explain). The motion is the data moving, never decoration; `prefers-reduced-motion` gets the final states directly.
 * Slide-design practice drawn from widely used community skills — Anthropic `frontend-design`, `frontend-slides` (fixed 16:9 stage, presenter-first), `impeccable` (one authored motion moment, browser surfaces themed), Emil Kowalski's design-engineering notes (fast ease-out, no slow keyboard-driven transitions), `taste-skill` (two or three type sizes do the work) — always subordinate to the course rules below.
 
+* **One scale for every variable** — the validation slide sets each phenotype against the Low-risk group (Low-risk = 1, ratio of shares or of medians, bootstrap intervals), following Few's advice to divide by the reference rather than draw small multiples on different scales. The per-variable distributions stay in the appendix.
 * **One colour per cluster, everywhere** — the four hues are the only colours in the deck; they were validated for colour-vision deficiency (all-pairs ΔE ≥ 8.6). Grey is "not yet clustered".
 * **Titles state the finding** (presentation task, Keim via Nagel); each figure answers one question.
 * **Show the sample, not only its averages** — patient-level heatmap, notched boxes over the raw points, 95% intervals on every proportion, a unit chart where one dot is one person.
