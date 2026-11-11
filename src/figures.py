@@ -391,50 +391,73 @@ def repel(items, min_gap):
     return items
 
 
-def f_volcano():
+SUP = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+
+def fmt_q(q):
+    """q-value as text: 0.51, 0.0002, 4×10⁻⁷ ..."""
+    if q >= 0.001:
+        return f"{q:.2g}" if q < 0.01 else f"{q:.2f}"
+    e = int(np.floor(np.log10(q)))
+    m = round(q / 10 ** e)
+    if m >= 10:
+        m, e = 1, e + 1
+    return f"{m}×10{str(e).translate(SUP)}"
+
+
+def f_effects():
+    """Ranked dot plot (Cleveland): one row per held-out variable, sorted by effect size.
+    Replaces the volcano, whose y-axis (q) was crowded and carried little: 21 of 22 q are tiny."""
     t = pd.read_csv(RES / "tests_global.csv")
     t = t[t.block == "external"].copy()
-    t["nlq"] = -np.log10(t.q.clip(lower=1e-300))
-    fig, ax = plt.subplots(figsize=(12.5, 6.4))
-    ax.set_yscale("log")
-    ax.axvspan(-0.2, 0.2, color=HAIR, alpha=0.55, lw=0)
-    ax.axhline(-np.log10(0.05), color=MUTED, lw=0.9)
-    ax.text(-1.22, -np.log10(0.05) * 1.08, "q = 0.05", fontsize=10.5, color=MUTED, ha="left", va="bottom")
-    ax.text(0, 300, "too small\nto matter", ha="center", va="top", fontsize=10.5, color=MUTED)
-    for _, r in t.iterrows():
-        c = CL[int(r.top_cluster)]
+    t["absd"] = t.top_std_diff.abs()
+    t = t.sort_values("absd", ascending=False).reset_index(drop=True)
+    n = len(t)
+    fig, ax = plt.subplots(figsize=(11.8, 6.6))
+    fig.subplots_adjust(left=0.21, right=0.60, top=0.90, bottom=0.10)
+    ax.axvspan(-0.2, 0.2, color=HAIR, alpha=0.55, lw=0, zorder=0)
+    ax.axvline(0, color=MUTED, lw=0.8, zorder=1)
+    for i, r in t.iterrows():
+        y = i
+        sig = r.q < 0.05
+        c = CL[int(r.top_cluster)] if sig else MUTED
         mk = "o" if r.type == "continuous" else "s"
-        ax.scatter(r.top_std_diff, r.nlq, s=70, marker=mk, color=c, edgecolors="white", linewidths=1.2, zorder=3)
-    ax.set_xlim(-1.25, 2.6)
-    ax.set_ylim(0.2, 400)
-    fig.canvas.draw()
-    inv = ax.transAxes.inverted()
-    sides = {"L": [], "R": []}
-    for _, r in t.iterrows():
-        xa, ya = inv.transform(ax.transData.transform((r.top_std_diff, r.nlq)))
-        side = "L" if r.top_std_diff < -0.2 or r.variable in ("uninsured",) and False else "R"
-        sides[side].append([ya, xa, r])
-    for side, items in sides.items():
-        # group labels whose points are horizontally close, then repel vertically
-        repel(items, 0.045)
-        for ya, xa, r in items:
-            px, py = r.top_std_diff, r.nlq
-            tx = xa + (0.018 if side == "R" else -0.018)
-            ax.annotate(LABELS[r.variable], (px, py), xytext=(tx, ya), textcoords="axes fraction",
-                        fontsize=10.5, ha="left" if side == "R" else "right", va="center", color=INK,
-                        arrowprops=dict(arrowstyle="-", color=HAIR, lw=0.7, shrinkA=0, shrinkB=4))
+        ax.plot([0, r.top_std_diff], [y, y], color=c, lw=1.4, alpha=0.45 if sig else 0.6, zorder=2,
+                solid_capstyle="butt")
+        ax.scatter(r.top_std_diff, y, s=62, marker=mk, color=c if sig else "white",
+                   edgecolors="white" if sig else MUTED, linewidths=1.2, zorder=3)
+        tcol = INK if sig else MUTED
+        ax.text(-0.012, y, LABELS[r.variable], transform=ax.get_yaxis_transform(), ha="right",
+                va="center", fontsize=10.5, color=tcol)
+        nm = NAMES[int(r.top_cluster)]
+        word = "higher" if r.top_std_diff > 0 else "lower"
+        ax.text(1.03, y, f"{nm} {word}" if sig else "no difference", transform=ax.get_yaxis_transform(),
+                ha="left", va="center", fontsize=10.5, color=c if sig else MUTED,
+                weight=600 if sig else "normal")
+        ax.text(1.64, y, fmt_q(r.q) + ("" if sig else "  n.s."), transform=ax.get_yaxis_transform(),
+                ha="right", va="center", fontsize=10, color=INK2 if sig else MUTED)
+    ax.set_ylim(n - 0.4, -0.8)
+    ax.set_xlim(-1.15, 2.2)
+    ax.set_yticks([])
+    ax.set_xticks([-1, -0.5, 0, 0.5, 1, 1.5, 2])
+    ax.set_xticklabels(["−1", "−0.5", "0", "0.5", "1", "1.5", "2"])
+    grid(ax, "x")
+    for s in ("left", "right", "top"):
+        ax.spines[s].set_visible(False)
     ax.set_xlabel("Standardised difference: the cluster that departs most vs. all others (SD)")
-    ax.set_ylabel("−log₁₀ q  (BH-adjusted across 22 tests · log scale)")
-    ax.set_yticks([1, 3, 10, 30, 100, 300])
-    ax.set_yticklabels(["1", "3", "10", "30", "100", "300"])
-    ax.yaxis.set_minor_locator(plt.NullLocator())
-    grid(ax, "both")
-    for i, nm in enumerate(NAMES):
-        ax.scatter([], [], color=CL[i], s=60, label=nm)
-    ax.scatter([], [], marker="o", color="white", edgecolors=INK2, s=50, label="continuous · Kruskal–Wallis")
-    ax.scatter([], [], marker="s", color="white", edgecolors=INK2, s=50, label="binary · χ²")
-    ax.legend(loc="lower right", fontsize=10.5, ncol=2, handletextpad=0.3, columnspacing=1.2)
-    save(fig, "f10_volcano_external")
+    # column headers
+    hy = -1.35
+    kw = dict(transform=ax.get_yaxis_transform(), fontsize=10, color=MUTED, va="bottom")
+    ax.text(-0.012, hy, "Held-out variable", ha="right", **kw)
+    ax.text(-1.15, hy, "← lower", ha="left", **dict(kw, transform=ax.transData))
+    ax.text(2.2, hy, "higher →", ha="right", **dict(kw, transform=ax.transData))
+    ax.text(1.03, hy, "Departs most", ha="left", **kw)
+    ax.text(1.64, hy, "q (BH)", ha="right", **kw)
+    # marker key, bottom right
+    ax.scatter([], [], marker="o", color="white", edgecolors=INK2, s=46, label="continuous · Kruskal–Wallis")
+    ax.scatter([], [], marker="s", color="white", edgecolors=INK2, s=46, label="binary · χ²")
+    ax.legend(loc="lower right", fontsize=10, frameon=False, handletextpad=0.3, borderaxespad=0.2)
+    save(fig, "f10_effects_external")
 
 
 def f_external_multiples():
@@ -802,7 +825,7 @@ def f_vs_lowrisk():
 
 
 ALL = [export_deck_data, f_distributions, f_correlation, f_cloud, f_ksel, f_alluvial, f_umap, f_centroids,
-       f_patients, f_volcano, f_external_multiples, f_undiagnosed, f_liver, f_cv, f_uni_multi,
+       f_patients, f_effects, f_external_multiples, f_undiagnosed, f_liver, f_cv, f_uni_multi,
        f_forest, f_shap, f_hypothesis, f_vs_lowrisk]
 
 if __name__ == "__main__":
