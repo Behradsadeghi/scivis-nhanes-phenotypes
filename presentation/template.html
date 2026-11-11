@@ -382,7 +382,7 @@ body.embed{background:var(--paper)}
     <div class="idx">Part 3 of 5</div>
     <div class="name">Describe</div>
     <p class="q">Name the four groups from their pattern, not from a hypothesis.</p>
-    <p class="how">Description only: the biomarkers built the clusters, so their differences are a statement about the cut, not evidence (Lecture 6b).</p>
+    <p class="how">Description only: k-means drew its boundaries exactly where these biomarkers differ, so testing them would be circular.</p>
     
   </div>
   
@@ -397,7 +397,7 @@ body.embed{background:var(--paper)}
       <h3>Reading it</h3>
       <p>Cell = cluster mean in SD from the cohort mean. <span style="color:var(--pos);font-weight:600">Warm</span> above, <span style="color:var(--neg);font-weight:600">cool</span> below.</p>
       <p><span class="k k1"></span><strong>Inflammatory:</strong> CRP 8.3 vs 1.5 mg/L in Low-risk.<br><span class="k k2"></span><strong>Hepatic:</strong> ALT 33 vs 17 U/L.<br><span class="k k3"></span><strong>Dysglycaemic:</strong> HbA1c 8.3%.</p>
-      <p class="method">Description only: these biomarkers built the clusters, so their differences are not evidence (Lecture 6b, slide 4).</p>
+      <p class="method">Description only: these biomarkers built the clusters, so a p-value on them would only confirm where k-means cut.</p>
     </aside>
   </div>
 </section>
@@ -413,15 +413,16 @@ body.embed{background:var(--paper)}
   <div class="fieldnote">The 454 adults whose blood meets the diabetes criteria: <span class='dot'></span>told <span class='ring' style='margin-left:8px'></span>never told</div>
 </section>
 
-<!-- 12 VOLCANO -->
-<section class="slide" data-part="3" data-notes="Now the test that can fail. Twenty-two variables the clustering never saw, one test each — Kruskal–Wallis or chi-squared — with Benjamini–Hochberg across all twenty-two. Horizontal axis: the effect, as the standardised difference between the cluster that departs most and everyone else. Vertical: adjusted significance on a log scale. Twenty-one of twenty-two survive; only insurance does not. But look at the horizontal axis: income, smoking and education are significant and small. Diagnosis, body size and sex are large.">
+<!-- 12 EFFECTS (ranked dot plot) -->
+<section class="slide" data-part="3" data-notes="Now the test that can fail. Twenty-two variables the clustering never saw, one test each — Kruskal–Wallis or chi-squared — with Benjamini–Hochberg across all twenty-two. One row per variable, sorted by the size of the effect: the standardised difference between the cluster that departs most and everyone else. The columns on the right say which cluster, in which direction, and the adjusted q. Twenty-one of twenty-two survive; only insurance does not. Significance alone cannot rank them — almost every q is tiny — so we rank by size. Diagnosis, body size and sex are large. Income, smoking and education are real but small: they sit right next to the grey band of differences too small to matter. The next slide puts the most important of these on one common scale.">
   <h2>Built from blood alone, the clusters still differ on 21 of the 22 things they never saw</h2>
   <div class="body">
-    <figure class="fig">{{SVG:f10_volcano_external}}</figure>
+    <figure class="fig">{{SVG:f10_effects_external}}</figure>
     <aside class="note">
       <h3>Reading it</h3>
-      <p>Right and high: large and certain. The grey band marks differences under 0.2 SD — <strong>too small to matter</strong> whatever the q.</p>
-      <p>Colour = the cluster that departs most. Income is real but small; diagnosis is large.</p>
+      <p>One row per variable, <strong>largest effect on top</strong>. Right of zero: that cluster is higher; left: lower.</p>
+      <p>Grey band: under 0.2 SD — <strong>too small to matter</strong>, whatever the q.</p>
+      <p><strong>Large:</strong> diabetes, body size, sex, age. <strong>Real but small:</strong> income, smoking, education. <strong>None:</strong> insurance.</p>
       <p class="method">Kruskal–Wallis (continuous), χ² (binary) · Benjamini–Hochberg across 22 tests · n = 1,986–2,290 per test.</p>
     </aside>
   </div>
@@ -633,7 +634,7 @@ body.embed{background:var(--paper)}
   </table>
 </section>
 
-<section class="slide" data-appendix data-part="3" data-notes="The distributions behind the volcano, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
+<section class="slide" data-appendix data-part="3" data-notes="The distributions behind the effect ranking, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
   <div class="appx">Appendix</div><h2>The distributions behind the ratios: each variable on its own scale</h2>
   <div class="body full">
     <figure class="fig">{{SVG:f11_external_multiples}}</figure>
