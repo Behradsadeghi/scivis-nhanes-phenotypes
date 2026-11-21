@@ -107,6 +107,20 @@ strong{color:var(--ink);font-weight:600}
 .step.on span{color:var(--ink);font-weight:600}
 .count{font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
 .rail .src{white-space:nowrap}
+.clean{width:100%;border-collapse:collapse;margin-top:26px;font-size:16.5px;line-height:1.4}
+.clean th{text-align:left;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 18px 10px 0;border-bottom:1.5px solid var(--ink)}
+.clean td{padding:11px 18px 11px 0;border-bottom:1px solid var(--hair);vertical-align:top;color:var(--ink-2)}
+.clean td:first-child{font-weight:600;color:var(--muted);width:28px}
+.clean td:nth-child(2){font-weight:600;color:var(--ink);width:250px}
+.clean td:nth-child(4){color:var(--ink);width:520px}
+.guess{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:64px}
+.guess div{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:30px 36px 36px}
+.guess b{display:block;font-family:var(--display);font-size:34px;color:var(--muted);font-weight:600}
+.guess span{display:block;margin-top:14px;font-family:var(--display);font-size:76px;line-height:1;font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.guessnote{margin-top:auto;font-size:15px;color:var(--muted)}
+.callback{margin-top:4px;font-size:16px;color:var(--ink-2)}
+.rail .src{display:flex;flex-direction:column;gap:2px;font-size:12.5px;line-height:1.3;color:color-mix(in srgb,var(--muted) 62%,var(--paper))}
+
 
 /* ================================================================ HERO + OPENERS */
 .hero,.opener{padding:0}
@@ -125,6 +139,15 @@ strong{color:var(--ink);font-weight:600}
 :root[data-theme="swiss"] .opener .copy{border-top:10px solid var(--ink);padding-top:26px}
 .opener .q{margin-top:34px;font-size:30px;line-height:1.3;color:var(--ink);font-family:var(--display);font-weight:500;letter-spacing:-0.01em;max-width:600px;font-variation-settings:var(--dopsz)}
 :root[data-theme="swiss"] .opener .q{font-family:var(--text);font-weight:500}
+.chip{display:inline-block;font-size:13px;line-height:1;letter-spacing:.07em;text-transform:uppercase;font-weight:600;padding:6px 10px 5px;border-radius:999px;border:1.5px solid var(--ink);color:var(--ink);white-space:nowrap;vertical-align:middle}
+.chip.q-chip{background:var(--ink);color:var(--paper)}
+.from{margin-top:30px;font-size:18px;line-height:1.45;color:var(--ink-2);max-width:580px}
+.from .chip{margin-right:10px}
+.qrow{margin-top:22px}
+.qrow+.q{margin-top:10px}
+.ask{font-size:14px;line-height:1.3;color:var(--muted);font-weight:400;margin:0 0 12px;max-width:1300px}
+.ask .chip{margin-right:10px;font-size:12.5px;padding:5px 9px 4px}
+.take .from{display:block;margin:0 0 6px;font-size:14px}
 .opener .how{margin-top:22px;font-size:18px;line-height:1.5;color:var(--ink-2);max-width:560px}
 .opener .mini{margin-top:34px;display:flex;flex-direction:column;gap:9px;width:560px}
 .opener .mini div{display:grid;grid-template-columns:250px 1fr 64px;gap:14px;align-items:center;font-size:15.5px;color:var(--ink-2)}
@@ -148,6 +171,10 @@ strong{color:var(--ink);font-weight:600}
 .arrow svg path{stroke-dasharray:140;stroke-dashoffset:140}
 .slide.active .arrow svg path{animation:draw .9s var(--ease) .5s forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
+.qlist{display:grid;grid-template-columns:repeat(5,1fr);gap:26px;margin-top:auto;padding-top:24px;border-top:1px solid var(--hair)}
+.qlist .chip{margin-bottom:10px}
+.qlist p{font-size:17px;line-height:1.38;color:var(--ink)}
+.qlist .where{color:var(--muted);font-size:14.5px;margin-top:8px}
 .tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:auto;padding-top:28px;border-top:1px solid var(--hair)}
 .task h4{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:6px}
 .task p{font-size:18px;line-height:1.45}
@@ -230,7 +257,19 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 2 QUESTION -->
-<section class="slide" data-part="0" data-notes="The one rule we built the whole project around comes from the cluster-explanation lecture: a variable either builds the clusters or judges them — never both. Only the fourteen blood and urine biomarkers on the left enter k-means. Everything on the right — body size, blood pressure, what a doctor has told the person, income, education, insurance, food security, smoking — is held back. If the clusters still differ on the right-hand block, the partition is about people, not just about the matrix. Bottom row: Keim's three tasks, and which part of the talk does which.">
+<section class="slide" data-part="0" data-notes="Before any analysis, a quick guess — please keep your answer in mind. Among American adults whose blood meets the diabetes criteria, how many have never been told by a doctor that they have diabetes: one in ten, one in five, or one in three? We come back to it on slide 18, where the answer comes with something a single number cannot tell you: where these people are.">
+  <p class="ask"><span class="chip">Quick guess · before any analysis</span>hold your answer — it comes back on slide 18</p>
+  <h2>Of the adults whose blood meets the criteria for diabetes, how many have never been told by a doctor?</h2>
+  <div class="guess">
+    <div><b>A</b><span>1 in 10</span></div>
+    <div><b>B</b><span>1 in 5</span></div>
+    <div><b>C</b><span>1 in 3</span></div>
+  </div>
+  <p class="guessnote">Diabetes in the blood: HbA1c ≥ 6.5% or fasting glucose ≥ 126 mg/dL · NHANES 2017–18, US adults.</p>
+</section>
+
+<section class="slide" data-part="0" data-notes="The one rule we built the whole project around comes from the cluster-explanation lecture: a variable either builds the clusters or judges them — never both. Only the fourteen blood and urine biomarkers on the left enter k-means. Everything on the right — body size, blood pressure, what a doctor has told the person, income, education, insurance, food security, smoking — is held back. If the clusters still differ on the right-hand block, the partition is about people, not just about the matrix. Bottom row: the map of the talk. The question in the title is the one we brought; Q1 and Q2 split it into two steps — first, are there groups at all; then, do they matter outside the blood. Q3, Q4 and Q5 were not planned: each one was raised by an answer before it, and each needs a model to answer — none of them can be read off the raw data. The small Q label at the top of every slide says which question that slide answers.">
+  <p class="ask"><span class="chip">Main question</span>the one we brought — Q1 and Q2 split it; Q3–Q5 were raised by the answers</p>
   <h2>Do routine blood tests contain groups of people that matter beyond the blood?</h2>
   <div class="blocks">
     <div class="block">
@@ -260,10 +299,12 @@ body.embed{background:var(--paper)}
       </dl>
     </div>
   </div>
-  <div class="tasks">
-    <div class="task"><h4>Exploratory</h4><p>What does the raw data look like, and is there structure at all?</p><p class="where">Look · Cluster</p></div>
-    <div class="task"><h4>Confirmatory</h4><p>Do the clusters differ on what they never saw — by how much, after correction?</p><p class="where">Describe · Validate · Explain</p></div>
-    <div class="task"><h4>Presentation</h4><p>One message per chart, titled with the finding.</p><p class="where">Every slide title</p></div>
+  <div class="qlist">
+    <div><span class="chip q-chip">Q1</span><p>Do the 14 biomarkers contain groups stable enough to name?</p><p class="where">k-means · bootstrap · k ± 1 — slides 9–14</p></div>
+    <div><span class="chip q-chip">Q2</span><p>Do those groups mean anything outside the blood?</p><p class="where">22 held-out tests · BH · effect sizes — slides 15–17</p></div>
+    <div><span class="chip q-chip">Q3</span><p>Where is the diabetes nobody has diagnosed?</p><p class="where">raised by slide 7 · clusters × lab vs. told — slides 18–20</p></div>
+    <div><span class="chip q-chip">Q4</span><p>What in the blood places a person in a phenotype?</p><p class="where">raised by Q3 · held-out models · SHAP — slides 21–24</p></div>
+    <div><span class="chip q-chip">Q5</span><p>Is the Inflammatory group’s lower income about income itself?</p><p class="where">raised by Q2 · adjusted odds ratios — slide 25</p></div>
   </div>
 </section>
 
@@ -284,7 +325,24 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 4 DISTRIBUTIONS -->
+<section class="slide" data-part="0" data-notes="Before any chart of the biomarkers, the six decisions we took on the raw files, stated openly, because every later claim depends on them. One: insulin, triglycerides and LDL exist only for the morning fasting subsample, so we keep those 2,541 adults and drop the 21 pregnant women. Two: 230 adults miss at least one biomarker — LDL most often, partly because the Friedewald formula is undefined when triglycerides are above 400 — and we impute nothing: 2,290 complete cases. Three: NHANES codes refused and don't-know answers as numbers like 7 and 9; there are 75 of them, and they become missing, so each test uses everyone who answered. Four: 77 people said borderline diabetes; a doctor never said diabetes, so they count as not told. Five: eleven of the fourteen biomarkers have long right tails, so we log, standardise, and clip the 0.3% of values beyond four SD. Six: age is top-coded at 80 and income capped at 5 by NHANES; we keep them as reported. The clustering is unweighted, so our claims are about these 2,290 people; the headline number is also checked with survey weights.">
+  <p class="ask"><span class="chip">Raw data</span>before any model: what we cleaned, and why</p>
+  <h2>Six problems in the raw files, six decisions — and not one value imputed</h2>
+  <table class="clean">
+    <thead><tr><th></th><th>Problem</th><th>What we found</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Three biomarkers are fasting-only</td><td>Insulin, triglycerides and LDL exist only in the morning fasting subsample: 2,541 adults of 9,254 participants; 21 were pregnant.</td><td>Keep the fasting adults; drop pregnancy, which shifts lipids and glucose.</td></tr>
+      <tr><td>2</td><td>Missing biomarkers</td><td>230 adults lack at least one of the 14 — LDL most often (172), 25 of them because triglycerides above 400 mg/dL make Friedewald LDL undefined.</td><td>Complete cases only, <strong>no imputation</strong>: 2,290 adults.</td></tr>
+      <tr><td>3</td><td>Codes that are not answers</td><td>75 “refused” or “don’t know” answers (codes 7, 9, 77, 99) across 19 questions, from 66 people.</td><td>Set to missing; each test uses everyone who answered (n = 1,986–2,290).</td></tr>
+      <tr><td>4</td><td>“Borderline” diabetes</td><td>77 people answered “borderline” to “Has a doctor ever told you that you have diabetes?”</td><td>Counted as <em>not told</em>: no doctor said diabetes.</td></tr>
+      <tr><td>5</td><td>Long right tails</td><td>11 of 14 biomarkers are skewed: urine albumin/creatinine 15.7, insulin 10.4, CRP 7.2.</td><td>log, then z-score (insulin skew 10.4 → 0.35); the 104 values (0.3%) beyond ±4 SD are clipped.</td></tr>
+      <tr><td>6</td><td>Capped values and survey design</td><td>Age top-coded at 80 (156 people); income ratio capped at 5 (345) and missing for 304; NHANES oversamples some groups.</td><td>Kept as reported, marked on the axes; unweighted clustering, so claims are about these 2,290 — the headline 31% is checked with survey weights.</td></tr>
+    </tbody>
+  </table>
+</section>
+
 <section class="slide" data-part="0" data-notes="Before any model: the raw distributions. Eleven of the fourteen are right-skewed — glucose, HbA1c, CRP and the urine ratio have long tails of very high values. On a linear axis k-means would be dominated by those tails, so we log-transform the skewed ones and then standardise. The axes here are already on that log scale, but labelled in the original units so they can be read. The black line is the median; the red line is the clinical threshold a doctor would use.">
+  <p class="ask"><span class="chip">Raw data</span>before any model: what the fourteen numbers look like</p>
   <h2>Eleven of fourteen biomarkers are strongly right-skewed, so we analyse them on a log scale</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f02_distributions}}</figure>
@@ -297,7 +355,8 @@ body.embed{background:var(--paper)}
   </div>
 </section>
 
-<section class="slide" data-part="0" data-notes="Before clustering anything, we tested one hypothesis we brought from what is known about the subject — type 2 diabetes becomes more common with age, so HbA1c, the three-month average of blood sugar, should rise with age. Here it is on the raw data, one dot per adult. It holds: the median rises from 5.3% in the twenties to 5.9% in the sixties, and the share whose blood meets the diabetes criteria goes from 2% to 38%. Spearman rho is 0.48; it stays at 0.43 if we drop people on diabetes medication, whose HbA1c is lowered by treatment. The right panel shows something we did not expect at this stage: in every age group, fewer people have been told they have diabetes than have it in their blood. One variable at a time can show that the gap exists, but not who these people are. For that we need all fourteen biomarkers at once — which is where the next slides go.">
+<section class="slide" data-part="0" data-notes="This is not one of our questions: it is a known fact, checked on the raw data before any model, as a sanity check of the data. Before clustering anything, we tested one hypothesis we brought from what is known about the subject — type 2 diabetes becomes more common with age, so HbA1c, the three-month average of blood sugar, should rise with age. Here it is on the raw data, one dot per adult. It holds: the median rises from 5.3% in the twenties to 5.9% in the sixties, and the share whose blood meets the diabetes criteria goes from 2% to 38%. Spearman rho is 0.48; it stays at 0.43 if we drop people on diabetes medication, whose HbA1c is lowered by treatment. The right panel shows something we did not expect at this stage: in every age group, fewer people have been told they have diabetes than have it in their blood. One variable at a time can show that the gap exists, but not who these people are. For that we need all fourteen biomarkers at once — which is where the next slides go.">
+  <p class="ask"><span class="chip">Raw-data check</span>a known fact, checked before any model — not one of the questions</p>
   <h2>Our hypothesis holds in the raw data: HbA1c rises with age — and so does a gap between blood and diagnosis</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f02b_hypothesis_age}}</figure>
@@ -312,6 +371,7 @@ body.embed{background:var(--paper)}
 
 <!-- 5 CORRELATION -->
 <section class="slide" data-part="0" data-notes="Rank correlations, with the rows ordered by hierarchical clustering rather than alphabetically, so that modules become visible as blocks. Glucose and HbA1c travel together; triglycerides, insulin and HDL form a lipid–insulin block; ALT and GGT a liver block; CRP and white cells an inflammation block; creatinine and uric acid a kidney block. Most correlations are moderate — nothing here is redundant enough to drop.">
+  <p class="ask"><span class="chip">Raw data</span>before any model: what the fourteen numbers look like</p>
   <h2>The biomarkers travel in families: sugar, lipids and insulin, liver, inflammation, kidney</h2>
   <div class="body">
     <figure class="fig">{{SVG:f03_correlation}}</figure>
@@ -326,6 +386,7 @@ body.embed{background:var(--paper)}
 
 <!-- 6 CLOUD -->
 <section class="slide" data-part="0" data-notes="This is the honest starting point. Projected on its first two principal components the data is one cloud with a single density peak. Mean-shift, which looks for density peaks, puts 95% of people in one mode. The first component — a general metabolic axis — carries only 24% of the variance and it takes eight components to reach 80%. So we are not discovering islands; we are cutting a continuum into regions. The real test is whether those regions mean something outside the blood.">
+  <p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
   <h2>Projected onto its main axes, the data is one cloud, not islands</h2>
   <div class="body">
     <figure class="fig">{{SVG:f04_cloud}}</figure>
@@ -338,11 +399,13 @@ body.embed{background:var(--paper)}
   </div>
 </section>
 
-<section class="slide opener" data-part="1" data-field="cluster" data-notes="The dots move from the principal-component view to a UMAP layout and take the colour of their k-means cluster. Important caveat: UMAP only draws the result; the clustering ran in all fourteen dimensions, and the distances between regions in this picture mean nothing.">
+<section class="slide opener" data-part="1" data-field="cluster" data-notes="Question 1. Slide 9 showed one cloud with no islands, so any groups have to be found by analysis, not by eye: are there regions stable enough to name? The dots move from the principal-component view to a UMAP layout and take the colour of their k-means cluster. Important caveat: UMAP only draws the result; the clustering ran in all fourteen dimensions, and the distances between regions in this picture mean nothing.">
   <div class="copy">
     <div class="idx">Part 2 of 5</div>
     <div class="name">Cluster</div>
-    <p class="q">Cut the cloud into regions — and test whether the cut survives.</p>
+    <p class="from"><span class="chip">Found on slide 9</span>one cloud with no islands — any groups have to be found by analysis, not by eye.</p>
+    <div class="qrow"><span class="chip q-chip">Q1</span></div>
+    <p class="q">Do the 14 biomarkers contain groups stable enough to name?</p>
     <p class="how">k-means with 100 restarts, a second and third method that fail differently, bootstrap stability, and one step either side of the chosen k.</p>
     
   </div>
@@ -351,6 +414,7 @@ body.embed{background:var(--paper)}
 
 <!-- 7 K SELECTION -->
 <section class="slide" data-part="1" data-notes="Choosing k with three kinds of evidence instead of one score. Silhouette is low for every k — expected on a continuum — so it cannot choose. Stability can: we re-cluster 30 bootstrap samples and compare with the original partition. k equals 2, 3 and 4 are all stable, above 0.89; at k equals 5 stability drops to 0.77 and its worst bootstraps fall to 0.53. Agreement with a Gaussian mixture and with Ward linkage is moderate. We take k equals 4: the most detailed partition that still survives resampling.">
+  <p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
   <h2>k = 4 is the most detailed partition that still survives resampling</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f05_k_selection}}</figure>
@@ -365,6 +429,7 @@ body.embed{background:var(--paper)}
 
 <!-- 8 ALLUVIAL -->
 <section class="slide" data-part="1" data-notes="What happens at k minus one and k plus one. At k equals 3, Inflammatory and Hepatic merge into one insulin-resistant group, and part of the Inflammatory group falls back into Low-risk. At k equals 5 almost nothing moves except one new group: older people with high creatinine, uric acid and urine albumin — a renal profile — drawn from all four clusters, most of all from Dysglycaemic. The four phenotypes are not artefacts of one k: each one persists across the neighbouring solutions.">
+  <p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
   <h2>One step either side: at k = 3 two phenotypes merge, at k = 5 an older renal group splits off</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f06_alluvial}}</figure>
@@ -381,7 +446,9 @@ body.embed{background:var(--paper)}
   <div class="copy">
     <div class="idx">Part 3 of 5</div>
     <div class="name">Describe</div>
-    <p class="q">Name the four groups from their pattern, not from a hypothesis.</p>
+    <p class="from"><span class="chip">Found on slides 11 and 12</span>four regions that survive resampling and one step either side of k.</p>
+    <div class="qrow"><span class="chip q-chip">Q1 · continued</span></div>
+    <p class="q">What makes each region different? Name them from their pattern, not from a hypothesis.</p>
     <p class="how">Description only: k-means drew its boundaries exactly where these biomarkers differ, so testing them would be circular.</p>
     
   </div>
@@ -390,6 +457,7 @@ body.embed{background:var(--paper)}
 
 <!-- 10 CENTROIDS -->
 <section class="slide" data-part="2" data-notes="This replaces the usual Table 1. Each cell is the cluster mean in standard deviations from the cohort mean, columns ordered by how strongly the biomarker separates the clusters. The names come from the pattern, not from a hypothesis. Low-risk: high HDL, low triglycerides, insulin and CRP. Inflammatory: CRP more than five times the Low-risk level, high white cells, low albumin, normal liver enzymes. Hepatic: ALT and GGT about double, high triglycerides and uric acid. Dysglycaemic: glucose about 195 and HbA1c 8.3%, plus urine albumin — early kidney damage. These differences are descriptive: k-means put its boundaries exactly here.">
+  <p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
   <h2>Named from their pattern, not assumed in advance</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f08_centroids}}</figure>
@@ -402,11 +470,13 @@ body.embed{background:var(--paper)}
   </div>
 </section>
 
-<section class="slide opener" data-part="3" data-field="validate" data-notes="Now the part that can fail. Everything we test next was held back from the clustering. As a preview, the coloured dots are the 454 people whose blood meets the diabetes criteria: filled if a doctor told them, hollow if not. Watch where the hollow ones sit.">
+<section class="slide opener" data-part="3" data-field="validate" data-notes="Question 2. Slide 14 gave us four patterns, but they are made only of blood numbers. The question that raises is the one that can fail: do they mean anything outside the blood? Now the part that can fail. Everything we test next was held back from the clustering. As a preview, the coloured dots are the 454 people whose blood meets the diabetes criteria: filled if a doctor told them, hollow if not. Watch where the hollow ones sit.">
   <div class="copy">
     <div class="idx">Part 4 of 5</div>
     <div class="name">Validate</div>
-    <p class="q">Do the groups differ on 22 things the algorithm never saw?</p>
+    <p class="from"><span class="chip">Found on slide 14</span>four patterns made only of blood numbers.</p>
+    <div class="qrow"><span class="chip q-chip">Q2</span></div>
+    <p class="q">Do they mean anything outside the blood — on 22 things the algorithm never saw?</p>
     <p class="how">The test that can fail: diagnoses, blood pressure, self-rated health and money, with Benjamini–Hochberg correction and an effect size beside every q-value.</p>
     
   </div>
@@ -415,6 +485,7 @@ body.embed{background:var(--paper)}
 
 <!-- 12 EFFECTS (ranked dot plot) -->
 <section class="slide" data-part="3" data-notes="Now the test that can fail. Twenty-two variables the clustering never saw, one test each — Kruskal–Wallis or chi-squared — with Benjamini–Hochberg across all twenty-two. One row per variable, sorted by the size of the effect: the standardised difference between the cluster that departs most and everyone else. The columns on the right say which cluster, in which direction, and the adjusted q. Twenty-one of twenty-two survive; only insurance does not. Significance alone cannot rank them — almost every q is tiny — so we rank by size. Diagnosis, body size and sex are large. Income, smoking and education are real but small: they sit right next to the grey band of differences too small to matter. The next slide puts the most important of these on one common scale.">
+  <p class="ask"><span class="chip q-chip">Q2</span>Do those groups mean anything outside the blood?</p>
   <h2>Built from blood alone, the clusters still differ on 21 of the 22 things they never saw</h2>
   <div class="body">
     <figure class="fig">{{SVG:f10_effects_external}}</figure>
@@ -430,6 +501,7 @@ body.embed{background:var(--paper)}
 
 <!-- 13 MULTIPLES -->
 <section class="slide" data-part="3" data-notes="Same tests, now with one scale for everything. Following the slicer-dicer example from class, we take the Low-risk group as the reference and divide every other group by it, so one means as common as in Low-risk, two means twice as common. The grey numbers are the Low-risk values the ratios are relative to. Read the top block: every phenotype carries more diagnoses than Low-risk, and Dysglycaemic carries diagnosed diabetes thirteen times as often, heart disease or stroke 3.4 times. The age row is our hypothesis again: the Dysglycaemic group is 31% older. The bottom block is money: the Inflammatory group has a 25% lower income-to-poverty ratio and more food insecurity. These ratios are unadjusted; the forest plot later asks which of them survive when they are considered together. And keep the first row in mind — told diabetes is what doctors already know. The next slide is about what they do not.">
+  <p class="ask"><span class="chip q-chip">Q2</span>Do those groups mean anything outside the blood?</p>
   <h2>Against the Low-risk group, every phenotype carries more disease — and the Inflammatory one less money</h2>
   <div class="body wide">
     <figure class="fig">{{SVG:f11b_vs_lowrisk}}</figure>
@@ -442,7 +514,8 @@ body.embed{background:var(--paper)}
   </div>
 </section>
 
-<section class="slide" data-part="3" data-notes="This is where the gap from our age hypothesis comes back — and this time we can say where it is. This is the finding that no single variable shows. 454 adults have blood that meets the diabetes criteria — HbA1c at least 6.5% or fasting glucose at least 126. One in three of them, 143 people, say no doctor has ever told them; weighted to the US population the share is the same, 31%. Now the part only the clustering shows: most of the undiagnosed are not in the Dysglycaemic cluster. 93 of the 143 sit in the Inflammatory and Hepatic clusters, where more than half of the lab-defined diabetes is unknown to the patient.">
+<section class="slide" data-part="3" data-notes="Question 3, raised by slide 7: the raw data showed the gap but could not say where it is — only the clusters can. And this is the answer to the guess on slide 2: C, one in three. This is where the gap from our age hypothesis comes back — and this time we can say where it is. This is the finding that no single variable shows. 454 adults have blood that meets the diabetes criteria — HbA1c at least 6.5% or fasting glucose at least 126. One in three of them, 143 people, say no doctor has ever told them; weighted to the US population the share is the same, 31%. Now the part only the clustering shows: most of the undiagnosed are not in the Dysglycaemic cluster. 93 of the 143 sit in the Inflammatory and Hepatic clusters, where more than half of the lab-defined diabetes is unknown to the patient.">
+  <p class="ask"><span class="chip q-chip">Q3</span>Where is the diabetes nobody has diagnosed?</p>
   <h2>A third of lab-defined diabetes is undiagnosed — and most of it sits outside the “diabetic” cluster</h2>
   <div class="body">
     <div class="waffle" id="waffle"><div class="tip" id="wTip"></div></div>
@@ -450,6 +523,7 @@ body.embed{background:var(--paper)}
       <div class="big">143</div>
       <p>of <strong>454</strong> adults meeting the lab criteria were never told — <strong>31%</strong>, also 31% survey-weighted.</p>
       <p><strong>93 of the 143</strong> are in the <span class="k k1"></span>Inflammatory and <span class="k k2"></span>Hepatic clusters — the gap we saw by age, now located.</p>
+      <p class="callback">The guess on slide 2: <strong>C — 1 in 3.</strong></p>
       <p><span class="dot"></span>told by a doctor<br><span class="ring"></span>never told</p>
       <p class="method">One dot = one adult · hover for values · lab criteria: HbA1c ≥ 6.5% or fasting glucose ≥ 126 mg/dL · “told” from the DIQ interview.</p>
     </aside>
@@ -458,6 +532,7 @@ body.embed{background:var(--paper)}
 
 <!-- 15 EXPLORER -->
 <section class="slide" data-part="3" data-notes="Same landscape as before; switch the view. In the second view only the 454 lab-defined diabetics stay in colour: filled if a doctor told them, hollow if not. The filled ones crowd the Dysglycaemic corner — that is diabetes as medicine already sees it: median HbA1c 7.3%. The hollow ones are spread into the neighbouring Hepatic and Inflammatory regions, with median HbA1c 6.5% — just over the line, and with a profile that looks like a fatty liver or chronic inflammation rather than like diabetes. Hover any dot for that person's values.">
+  <p class="ask"><span class="chip q-chip">Q3</span>Where is the diabetes nobody has diagnosed?</p>
   <h2>Diagnosed diabetes looks diabetic; undiagnosed diabetes looks like its neighbours</h2>
   <div class="explorer">
     <div class="plot"><canvas id="exCanvas" aria-label="UMAP landscape of 2,290 adults with selectable views"></canvas><div class="tip" id="exTip"></div></div>
@@ -472,7 +547,8 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 16 LIVER -->
-<section class="slide" data-part="3" data-notes="The same gap, for the liver. In the Hepatic cluster, 39% have an ALT above the upper limit of normal — the usual blood sign of fat in the liver. Only 8% have ever been told they have a liver condition. Fatty liver is common, usually silent, and strongly tied to the same insulin resistance; this is the second thing the blood knows and the patient does not.">
+<section class="slide" data-part="3" data-notes="Still question 3, now for the liver: slide 14 showed the Hepatic group with liver enzymes about double — do they know? The same gap, for the liver. In the Hepatic cluster, 39% have an ALT above the upper limit of normal — the usual blood sign of fat in the liver. Only 8% have ever been told they have a liver condition. Fatty liver is common, usually silent, and strongly tied to the same insulin resistance; this is the second thing the blood knows and the patient does not.">
+  <p class="ask"><span class="chip q-chip">Q3</span>Where is the diabetes nobody has diagnosed?</p>
   <h2>39% of the Hepatic cluster have a raised ALT; 8% have ever been told about their liver</h2>
   <div class="body">
     <figure class="fig">{{SVG:f13_liver}}</figure>
@@ -485,12 +561,14 @@ body.embed{background:var(--paper)}
   </div>
 </section>
 
-<section class="slide opener" data-part="4" data-field="explain" data-notes="Last part: models that can be read. First we check that a model can recover the clusters on patients it never saw — that is what gives us the right to read its explanation. At the end we zoom in on one person, the dot circled on the right.">
+<section class="slide opener" data-part="4" data-field="explain" data-notes="Question 4. Q3 ended with people whose diabetes does not look like diabetes. That raises the next question: what in the blood actually places a person in a phenotype? Last part: models that can be read. First we check that a model can recover the clusters on patients it never saw — that is what gives us the right to read its explanation. At the end we zoom in on one person, the dot circled on the right.">
   <div class="copy">
     <div class="idx">Part 5 of 5</div>
     <div class="name">Explain</div>
-    <p class="q">Which variables carry each phenotype — and why is one patient where she is?</p>
-    <p class="how">Interpretable surrogate models, earned by held-out accuracy: permutation importance, odds ratios against Low-risk, and SHAP for a single case.</p>
+    <p class="from"><span class="chip">Found on slides 18 and 19</span>undiagnosed diabetes sits in the Inflammatory and Hepatic regions, and does not look diabetic.</p>
+    <div class="qrow"><span class="chip q-chip">Q4</span></div>
+    <p class="q">Then what in the blood places a person in a phenotype?</p>
+    <p class="how">Interpretable surrogate models, earned by held-out accuracy: permutation importance and SHAP for a single case. Last, Q5: odds ratios against Low-risk on the variables outside the blood.</p>
     
   </div>
   
@@ -498,6 +576,7 @@ body.embed{background:var(--paper)}
 
 <!-- 17 CV -->
 <section class="slide" data-part="4" data-notes="Before reading any model, we earn the right to read it. We train interpretable classifiers to predict the cluster label from the biomarkers and score them on patients they never saw, five stratified folds. The comparison that matters is with the majority-class baseline, 0.25 balanced accuracy. Every model clears it; the L1 logistic regression recovers 98% — unsurprising, since k-means cells are separated by linear boundaries. The clusters have a consistent signature, so there is something to explain.">
+  <p class="ask"><span class="chip q-chip">Q4</span>What in the blood places a person in a phenotype?</p>
   <h2>The clusters have a consistent signature: unseen patients are recovered 98% of the time</h2>
   <div class="body">
     <figure class="fig">{{SVG:f14_surrogate_cv}}</figure>
@@ -512,6 +591,7 @@ body.embed{background:var(--paper)}
 
 <!-- 18 UNI VS MULTI -->
 <section class="slide" data-part="4" data-notes="Two kinds of evidence on one pair of axes. Horizontal: how strongly the clusters differ on a biomarker, one at a time. Vertical: how much the random forest needs it, with every other biomarker available — measured on held-out patients by shuffling it. CRP, HbA1c, glucose and ALT are both different and needed: these define the phenotypes. GGT and insulin differ strongly but are not needed: ALT and triglycerides already carry their information. LDL is neither — cholesterol, the number most people know, says almost nothing about these phenotypes.">
+  <p class="ask"><span class="chip q-chip">Q4</span>What in the blood places a person in a phenotype?</p>
   <h2>CRP, HbA1c, glucose and ALT define the phenotypes; LDL cholesterol barely matters</h2>
   <div class="body">
     <figure class="fig">{{SVG:f15_uni_vs_multi}}</figure>
@@ -525,21 +605,8 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 19 FOREST -->
-<section class="slide" data-part="4" data-notes="Now the clinical description, using only the external block. A multinomial lasso predicts the cluster from age, sex, BMI, blood pressure, income, education, smoking, activity and diagnoses, with every cluster contrasted against Low-risk. Read as sentences. Inflammatory: heavier, more often women and smokers. Hepatic: heavier and mostly men. Dysglycaemic: heaviest and older. Compare with the ratio slide in the Validate part, where each variable stood alone: there the Inflammatory group had a 25% lower income. Here, once BMI and sex are in the model, the income odds ratio shrinks to one — the income gradient travels through body weight and sex, it does not act separately.">
-  <h2>Read as sentences: who belongs to each phenotype, compared with Low-risk</h2>
-  <div class="body wide">
-    <figure class="fig">{{SVG:f16_forest_external}}</figure>
-    <aside class="note row">
-      <h3>Reading it</h3>
-      <p><span class="k k1"></span>Heavier, more often <strong>women</strong> and smokers.<br><span class="k k2"></span>Heavier, mostly <strong>men</strong>.<br><span class="k k3"></span>Heaviest and <strong>older</strong>.</p>
-      <p>Income shrinks to 1 once BMI and sex are in: its gradient travels through them.</p>
-      <p class="method">Multinomial L1 logistic, C = 0.05 by CV · balanced accuracy 0.53 vs 0.25 · n = 1,879 complete cases · hollow = shrunk to zero.</p>
-    </aside>
-  </div>
-</section>
-
-<!-- 20 SHAP -->
-<section class="slide" data-part="4" data-notes="Finally, one person. A 44-year-old woman, BMI 28, who has never been told she has diabetes. Her HbA1c is 7.3% and her fasting glucose 149. The forest gives her a 95% probability of the Dysglycaemic phenotype, and SHAP shows that almost all of it comes from those two numbers. This is the level at which the analysis becomes useful: a single blood draw already contains the reason she should be seen.">
+<section class="slide" data-part="4" data-notes="Still question 4, for one person: one of the hollow rings from slide 19. A 44-year-old woman, BMI 28, who has never been told she has diabetes. Her HbA1c is 7.3% and her fasting glucose 149. The forest gives her a 95% probability of the Dysglycaemic phenotype, and SHAP shows that almost all of it comes from those two numbers. This is the level at which the analysis becomes useful: a single blood draw already contains the reason she should be seen.">
+  <p class="ask"><span class="chip q-chip">Q4</span>What in the blood places a person in a phenotype?</p>
   <h2>One patient, never told: the two numbers that place her in the Dysglycaemic group</h2>
   <div class="body">
     <figure class="fig">{{SVG:f17_shap_patient}}</figure>
@@ -553,7 +620,23 @@ body.embed{background:var(--paper)}
 </section>
 
 <!-- 21 LIMITS -->
+<section class="slide" data-part="4" data-notes="Question 5, raised by the ratio slide in the Validate part: the Inflammatory group had a lower income, unadjusted. Is that income itself? Now the clinical description, using only the external block. A multinomial lasso predicts the cluster from age, sex, BMI, blood pressure, income, education, smoking, activity and diagnoses, with every cluster contrasted against Low-risk. Read as sentences. Inflammatory: heavier, more often women and smokers. Hepatic: heavier and mostly men. Dysglycaemic: heaviest and older. Compare with the ratio slide in the Validate part, where each variable stood alone: there the Inflammatory group had a 25% lower income. Here, once BMI and sex are in the model, the income odds ratio shrinks to one — the income gradient travels through body weight and sex, it does not act separately.">
+  <p class="ask"><span class="chip q-chip">Q5</span>Is the Inflammatory group’s lower income about income itself?</p>
+  <h2>Read as sentences: who belongs to each phenotype, compared with Low-risk</h2>
+  <div class="body wide">
+    <figure class="fig">{{SVG:f16_forest_external}}</figure>
+    <aside class="note row">
+      <h3>Reading it</h3>
+      <p><span class="k k1"></span>Heavier, more often <strong>women</strong> and smokers.<br><span class="k k2"></span>Heavier, mostly <strong>men</strong>.<br><span class="k k3"></span>Heaviest and <strong>older</strong>.</p>
+      <p>Income shrinks to 1 once BMI and sex are in: its gradient travels through them.</p>
+      <p class="method">Multinomial L1 logistic, C = 0.05 by CV · balanced accuracy 0.53 vs 0.25 · n = 1,879 complete cases · hollow = shrunk to zero.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 20 SHAP -->
 <section class="slide" data-part="4" data-notes="What the pipeline does and does not establish. It establishes that these clusters differ on these variables, in this cohort, by these amounts — including on things the clustering never saw. It does not establish that the four phenotypes are natural kinds: the data is a continuum. It is cross-sectional, so there is no outcome over time. Diagnoses are self-reported. CRP is higher in women for hormonal reasons, which partly explains the sex balance of the Inflammatory group. And we did not use survey weights in the clustering, so the cluster shares are not US prevalence.">
+  <p class="ask"><span class="chip">Limits</span>what the answers to Q1–Q5 do and do not establish</p>
   <h2>What this establishes — and what it does not</h2>
   <div class="two">
     <div>
@@ -580,13 +663,14 @@ body.embed{background:var(--paper)}
 <!-- 22 CHECKLIST -->
 
 
-<section class="slide hero" data-part="4" data-field="close" data-notes="Three things to take away. One: routine biomarkers contain four stable regions, and those regions mean something outside the blood. Two: a third of lab-defined diabetes is unknown to the patient, and it does not look like diabetes — it looks like its neighbours. The rings on the right are those 143 people. Three: the income gradient is real but small, and it travels through body weight and sex. Code, data download and this presentation are in the repository. Thank you.">
+<section class="slide hero" data-part="4" data-field="close" data-notes="The answers to the five questions on slide 3. Q1 and Q2: routine biomarkers contain four stable regions, and those regions mean something outside the blood. Q3: a third of lab-defined diabetes is unknown to the patient, and it does not look like diabetes — it looks like its neighbours. The rings on the right are those 143 people. Q4: four numbers do most of the work — CRP, HbA1c, glucose and ALT. Q5: the income gradient is real but small, and it travels through body weight and sex. Code, data download and this presentation are in the repository. Thank you.">
   <div class="copy" style="top:96px;width:640px">
-    <h2 style="font-size:52px;border:none;padding:0">Three things the blood knew</h2>
+    <h2 style="font-size:52px;border:none;padding:0">Four things the blood knew</h2>
     <div class="take">
-      <p><strong>Four regions, not four islands</strong> — and they differ on 21 of 22 things the clustering never saw.</p>
-      <p><strong>A third of lab-defined diabetes is undiagnosed</strong>, and most of it looks like its neighbours, not like diabetes.</p>
-      <p><strong>Money matters, modestly:</strong> the income gradient is real, small, and travels through weight and sex.</p>
+      <p><span class="from"><span class="chip q-chip">Q1 · Q2</span></span><strong>Four regions, not four islands</strong> — and they differ on 21 of 22 things the clustering never saw.</p>
+      <p><span class="from"><span class="chip q-chip">Q3</span></span><strong>A third of lab-defined diabetes is undiagnosed</strong> — the guess on slide 2 was C — and most of it looks like its neighbours, not like diabetes.</p>
+      <p><span class="from"><span class="chip q-chip">Q4</span></span><strong>Four numbers do most of the work</strong> — CRP, HbA1c, glucose and ALT; LDL cholesterol barely matters.</p>
+      <p><span class="from"><span class="chip q-chip">Q5</span></span><strong>Money matters, modestly:</strong> the income gradient is real, small, and travels through weight and sex.</p>
     </div>
     <p class="repo">Code, data pipeline and slides: <a href="{{REPO}}">{{REPO_SHORT}}</a></p>
   </div>
@@ -595,7 +679,8 @@ body.embed{background:var(--paper)}
 
 <!-- 11 PATIENTS -->
 <section class="slide" data-appendix data-part="2" data-notes="The same thing without averaging. Every row is one person — all 2,290 of them — sorted by cluster, columns sorted by separation. The blocks are visible as blocks, but so is the spread inside them, and so are the people who do not fit: the warm rows inside the cool Low-risk band. A table of means would hide all of this.">
-  <div class="appx">Appendix</div><h2>Every patient is a row: bands of colour, with real spread inside them</h2>
+  <div class="appx">Appendix</div><p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
+  <h2>Every patient is a row: bands of colour, with real spread inside them</h2>
   <div class="body">
     <figure class="fig">{{SVG:f09_patients}}</figure>
     <aside class="note">
@@ -609,7 +694,8 @@ body.embed{background:var(--paper)}
 
 <!-- 9 UMAP -->
 <section class="slide" data-appendix data-part="1" data-notes="A two-dimensional picture of the fourteen-dimensional result. Important caveat from the dimensionality-reduction lecture: UMAP preserves neighbourhoods, not distances, so the size of the gaps between regions means nothing. The clusters were computed in the full fourteen-dimensional space; UMAP only draws them. The regions touch — again, a continuum cut into four neighbourhoods.">
-  <div class="appx">Appendix</div><h2>Four neighbouring regions of one landscape, not four separate islands</h2>
+  <div class="appx">Appendix</div><p class="ask"><span class="chip q-chip">Q1</span>Do the 14 biomarkers contain groups stable enough to name?</p>
+  <h2>Four neighbouring regions of one landscape, not four separate islands</h2>
   <div class="body">
     <figure class="fig">{{SVG:f07_umap}}</figure>
     <aside class="note">
@@ -635,14 +721,15 @@ body.embed{background:var(--paper)}
 </section>
 
 <section class="slide" data-appendix data-part="3" data-notes="The distributions behind the effect ranking, in one layout so the eye compares rather than decodes. Same colour, same order, everywhere. Age and blood pressure climb towards Dysglycaemic. The Inflammatory group is 78% women, the Hepatic group 77% men. Heart disease or stroke: 26% in Dysglycaemic against 8% in Low-risk. And money: the Inflammatory group has the lowest income-to-poverty ratio and more food insecurity than Low-risk. Self-rated health tracks all of it.">
-  <div class="appx">Appendix</div><h2>The distributions behind the ratios: each variable on its own scale</h2>
+  <div class="appx">Appendix</div><p class="ask"><span class="chip q-chip">Q2</span>Do those groups mean anything outside the blood?</p>
+  <h2>The distributions behind the ratios: each variable on its own scale</h2>
   <div class="body full">
     <figure class="fig">{{SVG:f11_external_multiples}}</figure>
   </div>
 </section>
 <div class="navzone l" id="navL" aria-hidden="true"></div><div class="navzone r" id="navR" aria-hidden="true"></div>
 <div class="rail" id="rail">
-  <span class="src">NHANES 2017–18 · n = 2,290</span>
+  <span class="src"><span>Source: CDC NHANES 2017–18 · n = 2,290</span><span>own calculations · src/analysis.py</span></span>
   <div class="steps">
     <div class="step"><i><b></b></i><span>Look</span></div>
     <div class="step"><i><b></b></i><span>Cluster</span></div>
