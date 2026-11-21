@@ -513,37 +513,6 @@ def f_external_multiples():
     save(fig, "f11_external_multiples")
 
 
-def f_undiagnosed():
-    fig, ax = plt.subplots(figsize=(15, 5.6))
-    per_row = 12
-    x0 = 0
-    for k in range(4):
-        s = d[(d.cluster == k) & (d.lab_diabetes == 1)].sort_values("dx_diabetes", ascending=False)
-        n = len(s)
-        told = (s.dx_diabetes == 1).values
-        for i, tl in enumerate(told):
-            cx = x0 + (i % per_row)
-            cy = i // per_row
-            if tl:
-                ax.scatter(cx, cy, s=58, color=CL[k], lw=0)
-            else:
-                ax.scatter(cx, cy, s=58, facecolor="white", edgecolor=CL[k], lw=1.6)
-        nund = int((~told).sum())
-        ax.text(x0 - 0.4, -3.3, NAMES[k], fontsize=13.5, weight=600, va="bottom")
-        ax.text(x0 - 0.4, -2.0, f"{n} meet lab criteria", fontsize=11, color=INK2, va="bottom")
-        ax.text(x0 - 0.4, -0.85, f"{nund} never told · {nund / n:.0%}", fontsize=11, color=INK, va="bottom",
-                weight=600)
-        x0 += per_row + 3.2
-    ax.set_xlim(-1, x0 - 2.5)
-    ax.set_ylim(21, -4.6)
-    ax.axis("off")
-    ax.set_aspect("equal")
-    ax.scatter([], [], s=58, color=INK2, label="told by a doctor")
-    ax.scatter([], [], s=58, facecolor="white", edgecolor=INK2, lw=1.6, label="never told")
-    ax.legend(loc="lower left", fontsize=11.5, ncol=1, bbox_to_anchor=(0.0, 0.12))
-    save(fig, "f12_undiagnosed")
-
-
 def f_liver():
     pc = pd.read_csv(RES / "proportions_ci.csv")
     fig, ax = plt.subplots(figsize=(11, 4.8))
@@ -825,7 +794,7 @@ def f_vs_lowrisk():
 
 
 ALL = [export_deck_data, f_distributions, f_correlation, f_cloud, f_ksel, f_alluvial, f_umap, f_centroids,
-       f_patients, f_effects, f_external_multiples, f_undiagnosed, f_liver, f_cv, f_uni_multi,
+       f_patients, f_effects, f_external_multiples, f_liver, f_cv, f_uni_multi,
        f_forest, f_shap, f_hypothesis, f_vs_lowrisk]
 
 if __name__ == "__main__":
