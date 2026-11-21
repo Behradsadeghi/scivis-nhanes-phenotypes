@@ -4,7 +4,7 @@
 Scientific Visualization · MSc Computer Science · Università degli Studi di Milano · 2026–27
 Behrad Sadeghi · Mohammad Ali Noroozshad · Saba Shafiei Sabet
 
-**Presentation:** [`presentation/index.html`](presentation/index.html) — a single self-contained file (25 slides + 4 appendix). A static backup is in [`presentation/slides.pdf`](presentation/slides.pdf).
+**Presentation:** [`presentation/index.html`](presentation/index.html) — a single self-contained file (27 slides + 4 appendix). A static backup is in [`presentation/slides.pdf`](presentation/slides.pdf).
 With GitHub Pages enabled on this repo, it is served at `https://<user>.github.io/<repo>/`.
 
 | Key | Action |
@@ -14,7 +14,7 @@ With GitHub Pages enabled on this repo, it is served at `https://<user>.github.i
 | **N** | speaker notes under the slide |
 | **F** | full screen |
 
-Slides 16 and 17 are interactive (hover a dot for that adult's values; switch the view on slide 17).
+Slides 18 and 19 are interactive (hover a dot for that adult's values; switch the view on slide 19).
 
 ---
 
@@ -65,6 +65,9 @@ pip install -r requirements.txt
 * Slide-design practice drawn from widely used community skills — Anthropic `frontend-design`, `frontend-slides` (fixed 16:9 stage, presenter-first), `impeccable` (one authored motion moment, browser surfaces themed), Emil Kowalski's design-engineering notes (fast ease-out, no slow keyboard-driven transitions), `taste-skill` (two or three type sizes do the work) — always subordinate to the course rules below.
 
 * **One scale for every variable** — the validation slide sets each phenotype against the Low-risk group (Low-risk = 1, ratio of shares or of medians, bootstrap intervals), following Few's advice to divide by the reference rather than draw small multiples on different scales. The per-variable distributions stay in the appendix.
+* **A ranked dot plot instead of a volcano** — 21 of the 22 q-values are tiny, so a significance axis mostly stacked points on top of each other. One row per held-out variable, sorted by effect size, with the departing cluster and q as readable columns (Cleveland / Few: position on a common scale, labels next to the data).
+* **Five linked questions, labelled on every slide** — Q1–Q5 are listed on slide 3; each needs a model to answer and is raised by the answer before it. A small Q label with the question in grey sits at the top of every slide. Slide 7 (HbA1c vs age) is a raw-data check, not one of the questions.
+* **Cleaning decisions stated openly** — slide 5 lists six problems in the raw files and the decision taken for each (fasting subsample, complete cases with no imputation, refused/don't-know codes, borderline answers, long tails, top-coding and survey design).
 * **One colour per cluster, everywhere** — the four hues are the only colours in the deck; they were validated for colour-vision deficiency (all-pairs ΔE ≥ 8.6). Grey is "not yet clustered".
 * **Titles state the finding** (presentation task, Keim via Nagel); each figure answers one question.
 * **Show the sample, not only its averages** — patient-level heatmap, notched boxes over the raw points, 95% intervals on every proportion, a unit chart where one dot is one person.
